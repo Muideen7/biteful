@@ -9,6 +9,7 @@ import '../../config/motion.dart';
 import '../../widgets/rider/rider.dart';
 import '../../widgets/rider/rider_painter.dart';
 import '../../widgets/wordmark.dart';
+import '../shell/brand_header_hero.dart';
 
 /// The hero tag shared by the sign-in header and the home header, so the
 /// green shape morphs from one into the other on sign in.
@@ -40,10 +41,18 @@ class BrandHeaderShape extends StatelessWidget {
 /// [t] is the screen's entrance progress (0..1); the header drops in, the
 /// wordmark fades up, then the rider drives in from the right edge.
 class AuthHeader extends StatelessWidget {
-  const AuthHeader({super.key, required this.t, required this.height});
+  const AuthHeader(
+      {super.key,
+      required this.t,
+      required this.height,
+      this.headerInPlace = false});
 
   final double t;
   final double height;
+
+  /// True when the green shape has just morphed in from another screen (on
+  /// sign out): it is already where it belongs, so it does not drop in.
+  final bool headerInPlace;
 
   double _seg(double a, double b, [Curve c = Motion.enter]) =>
       c.transform(((t - a) / (b - a)).clamp(0.0, 1.0));
@@ -52,7 +61,7 @@ class AuthHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final top = MediaQuery.paddingOf(context).top;
     final width = MediaQuery.sizeOf(context).width;
-    final drop = _seg(0, .35);
+    final drop = headerInPlace ? 1.0 : _seg(0, .35);
     final text = _seg(.2, .5);
     final drive = _seg(.3, .75, Curves.easeOutCubic);
     final riderW = (width * .56).clamp(190.0, 260.0);
@@ -67,14 +76,12 @@ class AuthHeader extends StatelessWidget {
               translation: Offset(0, -(1 - drop)),
               child: Opacity(
                 opacity: .35 + .65 * drop,
-                child: Hero(
-                  tag: brandHeaderTag,
-                  child: BrandHeaderShape(
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                          bottom: Radius.circular(Radii.header)),
-                      child: const _DriftingLight(),
-                    ),
+                child: const BrandHeaderHero(
+                  radius: Radii.header,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(Radii.header)),
+                    child: _DriftingLight(),
                   ),
                 ),
               ),

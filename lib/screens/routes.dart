@@ -4,7 +4,7 @@ import '../config/motion.dart';
 
 /// A cross-fade route. Shared Hero elements (the green header) morph across
 /// it, which is what makes sign-in hand over to Home as one motion.
-Route<T> fadeRoute<T>(Widget page, {Duration duration = Motion.handOff}) {
+PageRoute<T> fadeRoute<T>(Widget page, {Duration duration = Motion.handOff}) {
   return PageRouteBuilder<T>(
     transitionDuration: duration,
     reverseTransitionDuration: duration,

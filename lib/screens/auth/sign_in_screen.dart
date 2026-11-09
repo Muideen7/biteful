@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/app_theme.dart';
 import '../../config/design_tokens.dart';
 import '../../config/motion.dart';
+import '../shell/brand_header_hero.dart';
 import '../splash/splash_overlay.dart';
 import '../../models/account.dart';
 import '../../providers/core_providers.dart';
@@ -25,7 +26,12 @@ enum _Pending { email, google, apple }
 /// Sign in and sign up on one card. The header above stays animated the
 /// whole time; switching mode grows a name field and swaps the copy.
 class SignInScreen extends ConsumerStatefulWidget {
-  const SignInScreen({super.key});
+  const SignInScreen({super.key, this.handOff = false});
+
+  /// True when arriving from inside the app (sign out): the green header
+  /// morphs in from the page before, so it does not drop in, and the rest
+  /// of the screen follows once it lands.
+  final bool handOff;
 
   @override
   ConsumerState<SignInScreen> createState() => _SignInScreenState();
@@ -49,10 +55,25 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
   String? _serverError;
   _Pending? _pending;
 
+  bool _started = false;
+  bool get _handOff => widget.handOff;
+
   @override
-  void initState() {
-    super.initState();
-    startWhenRevealed(ref, _entrance.forward);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    final arrival = ModalRoute.of(context)?.animation;
+    if (_handOff) {
+      // Wordmark, rider and form wait until the header has landed.
+      // From .2: the first part of the entrance is the header dropping
+      // in, which a hand-off skips, so the wordmark starts at once.
+      whenRouteArrived(arrival, () {
+        if (mounted) _entrance.forward(from: .2);
+      });
+    } else {
+      startWhenRevealed(ref, _entrance.forward);
+    }
   }
 
   @override
@@ -130,6 +151,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
           .signedInAs(profile, isNew: _signUp);
       if (!mounted) return;
       HapticFeedback.lightImpact();
+      ref.read(shellTabProvider.notifier).state = ShellTab.home;
       Navigator.of(context).pushReplacement(fadeRoute(const MainShell()));
     } on AuthFailure catch (e) {
       if (!mounted) return;
@@ -179,7 +201,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
           return CustomScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             slivers: [
-              SliverToBoxAdapter(child: AuthHeader(t: t, height: headerH)),
+              SliverToBoxAdapter(
+                  child: AuthHeader(
+                      t: t, height: headerH, headerInPlace: _handOff)),
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(Space.gutter + 4,
                     Space.xxl + 4, Space.gutter + 4, Space.xl),

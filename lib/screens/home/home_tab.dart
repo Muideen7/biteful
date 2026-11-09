@@ -10,9 +10,9 @@ import '../../models/catalog.dart';
 import '../../services/catalog_repository.dart';
 import '../../providers/core_providers.dart';
 import '../../widgets/common.dart';
-import '../auth/auth_header.dart';
 import '../actions.dart';
 import '../search/search_screen.dart';
+import '../shell/brand_header_hero.dart';
 import 'home_header.dart';
 import 'sections/best_sellers.dart';
 import 'sections/category_strip.dart';
@@ -38,10 +38,25 @@ class _HomeTabState extends ConsumerState<HomeTab>
   late final _entrance =
       AnimationController(vsync: this, duration: Motion.homeEntrance);
 
+  /// False while the green header is still morphing in from sign in. The
+  /// page is not built until it lands: building it mid-flight drops frames,
+  /// and content rising after the header reads as one motion.
+  bool _arrived = false;
+  bool _waiting = false;
+
   @override
-  void initState() {
-    super.initState();
-    startWhenRevealed(ref, _entrance.forward);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_waiting) return;
+    _waiting = true;
+    final arrival = ShellArrival.of(context);
+    startWhenRevealed(ref, () {
+      whenRouteArrived(arrival, () {
+        if (!mounted) return;
+        setState(() => _arrived = true);
+        _entrance.forward();
+      });
+    });
   }
 
   @override
@@ -89,7 +104,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
               left: 0,
               right: 0,
               height: barH + Sizes.homeHeaderReach,
-              child: const Hero(tag: brandHeaderTag, child: BrandHeaderShape()),
+              child: const BrandHeaderHero(radius: Radii.header),
             );
           },
         ),
@@ -102,7 +117,8 @@ class _HomeTabState extends ConsumerState<HomeTab>
             physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
             slivers: switch (catalog) {
-              AsyncData(:final value) => _content(value, barH),
+              AsyncData(:final value) when _arrived => _content(value, barH),
+              AsyncData() => const [],
               AsyncError() => [
                   SliverToBoxAdapter(
                       child: SizedBox(height: barH + Sizes.homeHeaderReach)),

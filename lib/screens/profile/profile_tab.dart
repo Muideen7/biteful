@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,31 +19,42 @@ import 'addresses_screen.dart';
 import 'avatar_sheet.dart';
 import 'edit_profile_sheet.dart';
 import '../routes.dart';
+import '../shell/brand_header_hero.dart';
 import '../shell/main_shell.dart';
 import '../shell/tab_page.dart';
 
 class ProfileTab extends ConsumerWidget {
   const ProfileTab({super.key});
 
-  Future<void> _signOut(BuildContext context, WidgetRef ref) async {
-    await ref.read(sessionProvider.notifier).signOut();
-    ref.read(shellTabProvider.notifier).state = ShellTab.home;
-    if (context.mounted) {
-      Navigator.of(context, rootNavigator: true)
-          .pushAndRemoveUntil(fadeRoute(const SignInScreen()), (_) => false);
-    }
+  /// Morphs the green header back into the sign-in screen, and only then
+  /// runs [then]. Signing out first would blank this page (name, photo)
+  /// while it is still on screen under the morph.
+  Future<void> _toSignIn(BuildContext context,
+      Future<void> Function(ProviderContainer) then) async {
+    // The container, not this widget's ref: this page is disposed when the
+    // sign-in route replaces the shell.
+    final container = ProviderScope.containerOf(context, listen: false);
+    final nav = Navigator.of(context, rootNavigator: true);
+    nav.popUntil((r) => r.isFirst);
+    final route = fadeRoute<void>(const SignInScreen(handOff: true));
+    // A replacement, not pushAndRemoveUntil: the old route stays alive
+    // under the transition, which is what lets the header Hero fly.
+    nav.pushReplacement(route);
+    // Wait for the whole transition: the old page is still fading out
+    // until the very end, and must not change under it.
+    final arrived = Completer<void>();
+    whenRouteArrived(route.animation, arrived.complete, settled: 1);
+    await arrived.future;
+    await then(container);
   }
+
+  Future<void> _signOut(BuildContext context) =>
+      _toSignIn(context, (c) => c.read(sessionProvider.notifier).signOut());
 
   /// Back to a first launch: cart, saved, orders, deal, address, read marks
   /// and the session all go, so the whole flow can be shown again.
-  Future<void> _reset(BuildContext context, WidgetRef ref) async {
-    await resetDemoData(ref);
-    ref.read(shellTabProvider.notifier).state = ShellTab.home;
-    if (context.mounted) {
-      Navigator.of(context, rootNavigator: true)
-          .pushAndRemoveUntil(fadeRoute(const SignInScreen()), (_) => false);
-    }
-  }
+  Future<void> _reset(BuildContext context) =>
+      _toSignIn(context, resetDemoData);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -192,13 +205,13 @@ class ProfileTab extends ConsumerWidget {
               icon: Icons.restart_alt_rounded,
               title: 'Reset demo data',
               value: 'Clears your cart, saved dishes, orders and edits',
-              onTap: () => _reset(context, ref),
+              onTap: () => _reset(context),
             ),
             _Row(
               icon: Icons.logout_rounded,
               title: 'Sign out',
               danger: true,
-              onTap: () => _signOut(context, ref),
+              onTap: () => _signOut(context),
             ),
           ]),
         ),

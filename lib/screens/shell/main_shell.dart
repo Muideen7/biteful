@@ -10,6 +10,7 @@ import '../home/home_tab.dart';
 import '../offers/offers_tab.dart';
 import '../profile/profile_tab.dart';
 import '../saved/saved_tab.dart';
+import 'brand_header_hero.dart';
 import '../../widgets/fly_to_cart.dart';
 
 enum ShellTab { home, saved, cart, offers, profile }
@@ -76,12 +77,21 @@ class _MainShellState extends ConsumerState<MainShell> {
     _visited.add(tab);
     return Scaffold(
       extendBody: true,
-      body: IndexedStack(
-        index: tab.index,
-        children: [
-          for (final t in ShellTab.values)
-            _visited.contains(t) ? _tab(t) : const SizedBox.shrink(),
-        ],
+      body: ShellArrival(
+        animation: ModalRoute.of(context)?.animation,
+        child: IndexedStack(
+          index: tab.index,
+          children: [
+            for (final t in ShellTab.values)
+              // Hidden tabs stay mounted, and their pages are each nested
+              // navigator's current route, so without this every visited
+              // tab's green header would try to fly at once.
+              HeroMode(
+                enabled: t == tab,
+                child: _visited.contains(t) ? _tab(t) : const SizedBox.shrink(),
+              ),
+          ],
+        ),
       ),
       bottomNavigationBar: const _NavBar(),
     );
