@@ -3,6 +3,8 @@ import 'package:dishly/providers/session_providers.dart';
 import 'package:dishly/screens/auth/auth_header.dart';
 import 'package:dishly/screens/auth/sign_in_screen.dart';
 import 'package:dishly/screens/home/home_tab.dart';
+import 'package:dishly/screens/home/sections/promo_art.dart';
+import 'package:dishly/widgets/rider/rider_hero.dart';
 import 'package:dishly/screens/profile/profile_tab.dart';
 import 'package:dishly/screens/shell/main_shell.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +56,40 @@ void main() {
             of: find.byType(HomeTab), matching: find.text('Categories')),
         findsOneWidget);
     expect(find.byType(SignInScreen), findsNothing);
+  });
+
+  testWidgets(
+      'the rider flies from the sign-in header into the banner, turning round',
+      (t) async {
+    phone(t);
+    final (c, _) = await makeContainer(seed);
+    await pumpScreen(t, c, const SignInScreen());
+    final start = t.getCenter(find.byType(RiderHero));
+    Finder f(String k) => find.descendant(
+        of: find.byKey(Key(k)), matching: find.byType(EditableText));
+    await t.enterText(f('email'), seed.demoEmail);
+    await t.enterText(f('password'), 'anything1');
+    await t.tap(find.text('Log In'));
+    await t.pump();
+    await t.pump();
+
+    // Partway: one rider in flight (the two ends are hidden), between the
+    // two places, and turned partway round the vertical axis.
+    await t.pump(Motion.handOff * .3);
+    // A turn round the vertical axis is the only transform with an x/z term.
+    final flying = find.byWidgetPredicate(
+        (w) => w is Transform && w.transform.entry(0, 2).abs() > .05);
+    expect(flying, findsWidgets);
+    expect(t.takeException(), isNull);
+
+    await t.pumpAndSettle();
+    // Landed in the banner, which sits under Home's header: up and left.
+    final banner = find.descendant(
+        of: find.byType(PromoBannerCard), matching: find.byType(RiderHero));
+    expect(banner, findsOneWidget);
+    final end = t.getCenter(banner);
+    expect(end.dx, lessThan(start.dx));
+    expect((t.widget<RiderHero>(banner).child).mirrored, isFalse);
   });
 
   testWidgets('signing out morphs back with the profile intact, then signs out',

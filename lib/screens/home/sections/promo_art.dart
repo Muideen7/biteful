@@ -7,6 +7,7 @@ import '../../../config/design_tokens.dart';
 import '../../../models/catalog.dart';
 import '../../../widgets/food_art_view.dart';
 import '../../../widgets/rider/rider.dart';
+import '../../../widgets/rider/rider_hero.dart';
 
 const _cream = Color(0xFFFBF8E6);
 const _butter = Color(0xFFFFE58A);
@@ -14,9 +15,17 @@ const _butter = Color(0xFFFFE58A);
 /// One promo banner, drawn in code: either the rider racing through a
 /// little city, or a big 3D dish on a dark green ground.
 class PromoBannerCard extends StatelessWidget {
-  const PromoBannerCard({super.key, required this.banner, this.parallax = 0});
+  const PromoBannerCard(
+      {super.key,
+      required this.banner,
+      this.parallax = 0,
+      this.riderHero = false});
 
   final PromoBanner banner;
+
+  /// This banner's rider is where the sign-in rider lands. Only one banner
+  /// may say so, or the flight has two destinations.
+  final bool riderHero;
 
   /// -1..1 while the page is being swiped.
   final double parallax;
@@ -27,7 +36,11 @@ class PromoBannerCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(Radii.xl),
       child: LayoutBuilder(
         builder: (context, c) => banner.showsRider
-            ? _RiderBanner(banner: banner, size: c.biggest, parallax: parallax)
+            ? _RiderBanner(
+                banner: banner,
+                size: c.biggest,
+                parallax: parallax,
+                hero: riderHero)
             : _ArtBanner(banner: banner, size: c.biggest, parallax: parallax),
       ),
     );
@@ -36,11 +49,19 @@ class PromoBannerCard extends StatelessWidget {
 
 class _RiderBanner extends StatelessWidget {
   const _RiderBanner(
-      {required this.banner, required this.size, required this.parallax});
+      {required this.banner,
+      required this.size,
+      required this.parallax,
+      this.hero = false});
+
+  final bool hero;
 
   final PromoBanner banner;
   final Size size;
   final double parallax;
+
+  static Rider _rider(double h) =>
+      Rider(width: h * 1.25, speed: 1, showBlob: false, showShadow: false);
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +72,7 @@ class _RiderBanner extends StatelessWidget {
         Positioned(
           left: -h * .1 + parallax * 30,
           bottom: -h * .1,
-          child: Rider(
-              width: h * 1.25, speed: 1, showBlob: false, showShadow: false),
+          child: hero ? RiderHero(child: _rider(h)) : _rider(h),
         ),
         Positioned(
           right: h * .08 - parallax * 18,

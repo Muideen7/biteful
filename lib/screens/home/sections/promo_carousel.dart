@@ -96,7 +96,12 @@ class _PromoCarouselState extends ConsumerState<PromoCarousel> {
                     semanticLabel:
                         '${b.lineOne} ${b.lineTwo}. ${b.subtitle}. ${b.cta}',
                     scale: .98,
-                    child: PromoBannerCard(banner: b, parallax: shift),
+                    child: PromoBannerCard(
+                      banner: b,
+                      parallax: shift,
+                      riderHero:
+                          i == widget.banners.indexWhere((x) => x.showsRider),
+                    ),
                   ),
                 );
               },
