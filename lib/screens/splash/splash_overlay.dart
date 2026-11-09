@@ -11,7 +11,7 @@ import '../../config/app_timing.dart';
 import '../../config/motion.dart';
 import '../../models/catalog.dart';
 import '../../providers/core_providers.dart';
-import '../../services/seed.dart';
+import '../../services/catalog_repository.dart';
 import '../../widgets/rider/rider.dart';
 import '../../widgets/wordmark.dart';
 
@@ -30,7 +30,7 @@ final splashPhaseProvider = StateProvider<SplashPhase>(
 /// letter, the tagline settles, then the rider pulls away to the right while
 /// the wordmark blurs out.
 ///
-/// It leaves only when the intro has played *and* the seed has loaded, so
+/// It leaves only when the intro has played *and* the menu has loaded, so
 /// it never dissolves onto a half-loaded screen.
 class SplashOverlay extends ConsumerStatefulWidget {
   const SplashOverlay({super.key});
@@ -54,7 +54,9 @@ class _SplashOverlayState extends ConsumerState<SplashOverlay>
   }
 
   Future<void> _run() async {
-    final ready = ref.read(seedProvider.future);
+    // The menu, through its repository: with a backend this is the first
+    // network call, and the splash covers it.
+    final ready = ref.read(catalogProvider.future);
     // Started, never awaited: decoding fills the hold but never extends it.
     ready.then(_warm).ignore();
     _in.addListener(_haptic);
@@ -78,15 +80,15 @@ class _SplashOverlayState extends ConsumerState<SplashOverlay>
 
   /// Decodes every food render while the splash holds, so the first screen
   /// does not decode forty images in its first frame.
-  Future<void> _warm(Seed seed) async {
+  Future<void> _warm(Catalog c) async {
     if (!mounted) return;
     final names = <String>{
       for (final a in [
-        ...seed.products.map((p) => p.art),
-        ...seed.categories.map((c) => c.art),
-        ...seed.restaurants.map((r) => r.art),
-        ...seed.deals.map((d) => d.art),
-        for (final b in seed.banners)
+        ...c.products.map((p) => p.art),
+        ...c.categories.map((x) => x.art),
+        ...c.restaurants.map((r) => r.art),
+        ...c.deals.map((d) => d.art),
+        for (final b in c.banners)
           if (b.art != null) b.art!,
       ]) ...[a.main, if (a.side != null) a.side!],
     };

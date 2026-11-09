@@ -101,16 +101,17 @@ void main() {
 
   testWidgets('reorder puts the past dish back in the cart', (t) async {
     final c = await pump(t);
-    await t.tap(find.bySemanticsLabel('Order Cheese Burger again'));
+    // The live order's ramen is the most recent dish.
+    await t.tap(find.bySemanticsLabel('Order Tonkotsu Ramen again'));
     await t.pumpAndSettle();
-    expect(c.read(cartProvider).single.productId, 'p_cheeseburger');
+    expect(c.read(cartProvider).single.productId, 'p_ramen');
   });
 
   testWidgets(
       'a dish opens its sheet; Add puts the chosen quantity in the cart',
       (t) async {
-    final c = await pump(t);
-    await t.tap(find.text('Cheese Burger').first);
+    final c = await pump(t, height: 3600);
+    await t.tap(home(find.text('Cheese Burger')).last);
     await t.pumpAndSettle();
     expect(find.text('from Stack House'), findsOneWidget);
     await t.tap(find.bySemanticsLabel('Increase'));

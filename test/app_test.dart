@@ -14,7 +14,9 @@ import 'helpers.dart';
 /// pump would run the splash's controllers only once.
 Future<void> pumpPastSplash(WidgetTester t) async {
   final total = AppTiming.splashTotal + const Duration(milliseconds: 600);
-  for (var e = Duration.zero; e < total; e += const Duration(milliseconds: 50)) {
+  for (var e = Duration.zero;
+      e < total;
+      e += const Duration(milliseconds: 50)) {
     await t.pump(const Duration(milliseconds: 50));
   }
   await t.pumpAndSettle();
@@ -28,8 +30,10 @@ void main() {
     phone(t);
     AppTiming.scale = 1;
     addTearDown(() => AppTiming.scale = 0);
-    final (c, _) = await makeContainer(seed, signedIn: signedIn ? seed.profile : null);
-    await t.pumpWidget(UncontrolledProviderScope(container: c, child: const DishlyApp()));
+    final (c, _) =
+        await makeContainer(seed, signedIn: signedIn ? seed.profile : null);
+    await t.pumpWidget(
+        UncontrolledProviderScope(container: c, child: const DishlyApp()));
   }
 
   testWidgets('the splash plays, then hands over to sign in', (t) async {
@@ -42,17 +46,21 @@ void main() {
     expect(find.byType(SignInScreen), findsOneWidget);
   });
 
-  testWidgets('a remembered session goes straight to Home after the splash', (t) async {
+  testWidgets('a remembered session goes straight to Home after the splash',
+      (t) async {
     await launch(t, signedIn: true);
     await pumpPastSplash(t);
     expect(find.byType(MainShell), findsOneWidget);
   });
 
-  testWidgets('the first screen is not rebuilt when the splash leaves', (t) async {
+  testWidgets('the first screen is not rebuilt when the splash leaves',
+      (t) async {
     await launch(t);
     // Into the drive-out: sign in is mounted underneath the dissolving splash.
     await t.pump(AppTiming.splashDriveIn);
-    for (var e = Duration.zero; e < AppTiming.splashHold + const Duration(milliseconds: 200); e += const Duration(milliseconds: 50)) {
+    for (var e = Duration.zero;
+        e < AppTiming.splashHold + const Duration(milliseconds: 200);
+        e += const Duration(milliseconds: 50)) {
       await t.pump(const Duration(milliseconds: 50));
     }
     expect(find.byType(SplashOverlay), findsOneWidget);
@@ -63,7 +71,8 @@ void main() {
 
   test('no em dashes in on-screen strings', () {
     final literal = RegExp(r'''(['"])(?:(?!\1).)*—(?:(?!\1).)*\1''');
-    for (final f in Directory('lib').listSync(recursive: true).whereType<File>()) {
+    for (final f
+        in Directory('lib').listSync(recursive: true).whereType<File>()) {
       for (final line in f.readAsLinesSync()) {
         if (line.trimLeft().startsWith('//')) continue;
         expect(literal.hasMatch(line), isFalse, reason: '${f.path}: $line');

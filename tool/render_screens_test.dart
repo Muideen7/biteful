@@ -6,6 +6,10 @@ import 'dart:ui' as ui;
 import 'package:dishly/config/app_theme.dart';
 import 'package:dishly/screens/auth/sign_in_screen.dart';
 import 'package:dishly/screens/restaurant/restaurant_screen.dart';
+import 'package:dishly/screens/search/search_screen.dart';
+import 'package:dishly/screens/orders/orders_screen.dart';
+import 'package:dishly/screens/orders/order_detail_screen.dart';
+import 'package:dishly/screens/profile/addresses_screen.dart';
 import 'package:dishly/screens/shell/main_shell.dart';
 import 'package:dishly/services/store.dart';
 import 'package:flutter/material.dart';
@@ -59,11 +63,12 @@ void main() {
 
   Future<ProviderContainer> app(WidgetTester tester, Widget home,
       {ThemeMode mode = ThemeMode.light,
-      Map<String, Object> prefs = const {}}) async {
+      Map<String, Object> prefs = const {},
+      DateTime? now}) async {
     phone(tester);
     tester.view.padding = const FakeViewPadding(top: 59 * 3, bottom: 34 * 3);
-    final (c, _) =
-        await makeContainer(seed, prefs: prefs, signedIn: seed.profile);
+    final (c, _) = await makeContainer(seed,
+        prefs: prefs, signedIn: seed.profile, now: now);
     await tester.pumpWidget(UncontrolledProviderScope(
       container: c,
       child: RepaintBoundary(
@@ -113,6 +118,35 @@ void main() {
     await _shot(t, 'cart');
   });
 
+  testWidgets('search results', (t) async {
+    await app(t, const SearchScreen(initialQuery: 'chicken'));
+    await _shot(t, 'search');
+  });
+
+  testWidgets('search empty box', (t) async {
+    await app(t, const SearchScreen(initialQuery: ''), prefs: {
+      Store.recentSearches: ['ramen', 'pizza', 'Umami Bar']
+    });
+    await _shot(t, 'search_start');
+  });
+
+  testWidgets('orders', (t) async {
+    await app(t, const OrdersScreen(),
+        now: testNow.add(const Duration(minutes: 7)));
+    await _shot(t, 'orders');
+  });
+
+  testWidgets('order on the way', (t) async {
+    await app(t, const OrderDetailScreen(orderId: 'o_live'),
+        now: testNow.add(const Duration(minutes: 9)));
+    await _shot(t, 'order_live');
+  });
+
+  testWidgets('addresses', (t) async {
+    await app(t, const AddressesScreen());
+    await _shot(t, 'addresses');
+  });
+
   testWidgets('restaurant', (t) async {
     await app(t, const RestaurantScreen(restaurantId: 'r_umami'));
     await _shot(t, 'restaurant');
@@ -120,9 +154,8 @@ void main() {
 
   testWidgets('product sheet', (t) async {
     await app(t, const MainShell());
-    await t.tap(find.text('Cheese Burger').first);
+    await t.tap(find.text('Tonkotsu Ramen').first);
     await t.pumpAndSettle();
     await _shot(t, 'product');
   });
 }
-

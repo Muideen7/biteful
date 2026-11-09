@@ -6,18 +6,15 @@ import '../../config/app_theme.dart';
 import '../../config/design_tokens.dart';
 import '../../providers/account_providers.dart';
 import '../../widgets/app_sheet.dart';
+import '../profile/addresses_screen.dart';
+import '../routes.dart';
+import '../shell/main_shell.dart';
 
 Future<void> showAddressSheet(BuildContext context) => showAppSheet(context,
     title: 'Deliver to', builder: (_) => const _AddressList());
 
 class _AddressList extends ConsumerWidget {
   const _AddressList();
-
-  static IconData _icon(String label) => switch (label.toLowerCase()) {
-        'home' => Icons.home_rounded,
-        'work' => Icons.work_rounded,
-        _ => Icons.place_rounded,
-      };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,7 +45,7 @@ class _AddressList extends ConsumerWidget {
                   padding: const EdgeInsets.all(Space.lg),
                   child: Row(
                     children: [
-                      Icon(_icon(a.label), color: p.accent),
+                      Icon(addressIcon(a.label), color: p.accent),
                       const SizedBox(width: Space.md),
                       Expanded(
                         child: Column(
@@ -71,6 +68,15 @@ class _AddressList extends ConsumerWidget {
               ),
             ),
           ),
+        TextButton.icon(
+          onPressed: () {
+            Navigator.pop(context);
+            tabNavigator(context).push(riseRoute(const AddressesScreen()));
+          },
+          icon: Icon(Icons.edit_location_alt_outlined, color: p.accent),
+          label: Text('Add or edit addresses',
+              style: TextStyle(color: p.accent, fontWeight: FontWeight.w700)),
+        ),
       ],
     );
   }

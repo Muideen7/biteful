@@ -1,4 +1,5 @@
 import 'package:dishly/providers/cart_providers.dart';
+import 'package:dishly/providers/order_providers.dart';
 import 'package:dishly/providers/session_providers.dart';
 import 'package:dishly/screens/auth/sign_in_screen.dart';
 import 'package:dishly/screens/shell/main_shell.dart';
@@ -69,10 +70,16 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('Order placed'), findsOneWidget);
     expect(c.read(cartProvider), isEmpty);
+    final placed = c.read(ordersProvider).first;
+    expect(placed.lines.single.productId, 'p_boba');
+    expect(placed.totalCents, 1100);
     expect(c.read(orderAgainProvider).first.productId, 'p_boba');
-    await t.tap(find.text('Done'));
+    // Track order opens the live order inside the Cart tab.
+    await t.tap(find.text('Track order'));
     await t.pumpAndSettle();
-    expect(find.text('Your cart is empty'), findsOneWidget);
+    expect(find.text(placed.reference), findsOneWidget);
+    expect(find.text('The kitchen is preparing your order'), findsOneWidget);
+    expect(find.text('Cart'), findsWidgets);
   });
 
   testWidgets('saved is empty, then lists a saved dish', (t) async {

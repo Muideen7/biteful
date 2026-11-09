@@ -15,20 +15,28 @@ void main() {
       theme: AppTheme.light(),
       home: Scaffold(
         body: Stack(children: [
-          Positioned(left: 20, top: 100, child: FoodArtView(const FoodArt('burger'), key: from, size: 80)),
-          Positioned(right: 30, bottom: 30, child: Icon(Icons.shopping_bag, key: cartTargetKey)),
+          Positioned(
+              left: 20,
+              top: 100,
+              child: FoodArtView(const FoodArt('burger'), key: from, size: 80)),
+          Positioned(
+              right: 30,
+              bottom: 30,
+              child: Icon(Icons.shopping_bag, key: cartTargetKey)),
         ]),
       ),
     ));
     return from;
   }
 
-  testWidgets('a copy of the dish flies to the cart, lands, and is cleaned up', (t) async {
+  testWidgets('a copy of the dish flies to the cart, lands, and is cleaned up',
+      (t) async {
     Motion.ambient = true;
     final from = await pump(t);
     final before = cartLanded.value;
     var landed = false;
-    flyToCart(t.element(find.byKey(from)), from, const FoodArt('burger')).then((_) => landed = true);
+    flyToCart(t.element(find.byKey(from)), from, const FoodArt('burger'))
+        .then((_) => landed = true);
     await t.pump();
     await t.pump(const Duration(milliseconds: 200));
     // The original plus the flying copy and its two trailing ghosts.
@@ -43,11 +51,13 @@ void main() {
     expect(find.byType(FoodArtView), findsOneWidget);
   });
 
-  testWidgets('with motion off it completes at once and nothing flies', (t) async {
+  testWidgets('with motion off it completes at once and nothing flies',
+      (t) async {
     Motion.ambient = false;
     final from = await pump(t);
     var landed = false;
-    flyToCart(t.element(find.byKey(from)), from, const FoodArt('burger')).then((_) => landed = true);
+    flyToCart(t.element(find.byKey(from)), from, const FoodArt('burger'))
+        .then((_) => landed = true);
     await t.pump();
     expect(landed, isTrue);
     expect(find.byType(FoodArtView), findsOneWidget);

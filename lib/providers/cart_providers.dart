@@ -97,38 +97,3 @@ class SavedNotifier extends Notifier<Set<String>> {
 
 final savedProvider =
     NotifierProvider<SavedNotifier, Set<String>>(SavedNotifier.new);
-
-/// Orders placed in this app, newest first. Seeded history is not copied in
-/// here: [orderAgainProvider] merges the two on read.
-class PlacedOrdersNotifier extends Notifier<List<PastOrder>> {
-  @override
-  List<PastOrder> build() {
-    final raw =
-        ref.watch(storeProvider).json<List<dynamic>>(Store.placedOrders) ??
-            const [];
-    return [for (final j in raw) PastOrder.fromJson(j as Map<String, dynamic>)];
-  }
-
-  Future<void> record(List<PastOrder> orders) async {
-    final next = [...orders, ...state];
-    state = next;
-    await ref
-        .read(storeProvider)
-        .setJson(Store.placedOrders, [for (final o in next) o.toJson()]);
-  }
-}
-
-final placedOrdersProvider =
-    NotifierProvider<PlacedOrdersNotifier, List<PastOrder>>(
-        PlacedOrdersNotifier.new);
-
-/// One card per dish, most recent order of it first.
-final orderAgainProvider = Provider<List<PastOrder>>((ref) {
-  final seed = ref.watch(seedProvider).valueOrNull;
-  final all = [...ref.watch(placedOrdersProvider), ...?seed?.pastOrders];
-  final seen = <String>{};
-  return [
-    for (final o in all)
-      if (seen.add(o.productId)) o
-  ];
-});

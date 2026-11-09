@@ -26,6 +26,17 @@ class SessionNotifier extends Notifier<UserProfile?> {
     }
   }
 
+  /// Saves edited details through the account repository, and keeps them
+  /// for the next launch if the session is remembered.
+  Future<void> updateProfile(UserProfile profile) async {
+    final saved = await (await ref.read(accountRepositoryProvider.future))
+        .updateProfile(profile);
+    state = saved;
+    if (_store.string(Store.session) != null) {
+      await _store.setJson(Store.session, saved.toJson());
+    }
+  }
+
   Future<void> signOut() async {
     state = null;
     await _store.setString(Store.session, null);

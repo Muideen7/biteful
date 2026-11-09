@@ -4,7 +4,9 @@ import 'package:dishly/config/app_timing.dart';
 import 'package:dishly/config/app_theme.dart';
 import 'package:dishly/config/motion.dart';
 import 'package:dishly/models/account.dart';
+import 'package:dishly/providers/account_providers.dart';
 import 'package:dishly/providers/core_providers.dart';
+import 'package:dishly/providers/order_providers.dart';
 import 'package:dishly/services/seed.dart';
 import 'package:dishly/services/store.dart';
 import 'package:flutter/material.dart';
@@ -33,16 +35,28 @@ void phone(WidgetTester tester, {Size size = const Size(390, 844)}) {
   addTearDown(tester.view.reset);
 }
 
+/// The fixed "now" every test runs at, unless it picks another.
+final testNow = DateTime(2026, 11, 9, 13, 0);
+
+/// [now] is both the clock and the first-launch stamp, so seeded orders are
+/// exactly their seeded age: the live one is 3 minutes old (preparing).
 Future<(ProviderContainer, Store)> makeContainer(
   Seed seed, {
   Map<String, Object> prefs = const {},
   UserProfile? signedIn,
+  DateTime? now,
+  DateTime? firstLaunch,
 }) async {
-  SharedPreferences.setMockInitialValues({...prefs});
+  final clock = now ?? testNow;
+  SharedPreferences.setMockInitialValues({
+    Store.seedStamp: '${(firstLaunch ?? testNow).millisecondsSinceEpoch}',
+    ...prefs,
+  });
   final store = Store(await SharedPreferences.getInstance());
   if (signedIn != null) await store.setJson(Store.session, signedIn.toJson());
   final container = ProviderContainer(overrides: [
     storeProvider.overrideWithValue(store),
+    clockProvider.overrideWithValue(() => clock),
     seedProvider.overrideWith((_) async => seed),
   ]);
   return (container, store);
@@ -58,6 +72,9 @@ Future<void> pumpScreen(
 }) async {
   await container.read(catalogProvider.future);
   await container.read(seedProvider.future);
+  await container.read(orderHistoryProvider.future);
+  await container.read(notificationFeedProvider.future);
+  await container.read(addressesProvider.future);
   await tester.pumpWidget(UncontrolledProviderScope(
     container: container,
     child: MaterialApp(

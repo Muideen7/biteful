@@ -4,23 +4,23 @@ import 'package:flutter/services.dart';
 import '../../config/app_theme.dart';
 import '../../config/design_tokens.dart';
 import '../../models/money.dart';
+import '../../models/order.dart';
+import '../actions.dart';
 import '../../widgets/app_sheet.dart';
 import '../../widgets/gradient_button.dart';
 import '../../widgets/rider/rider.dart';
 
 /// The rider sets off with your order.
 Future<void> showOrderPlacedSheet(BuildContext context,
-    {required String reference, required int total}) {
+    {required Order order}) {
   HapticFeedback.heavyImpact();
-  return showAppSheet(context,
-      builder: (_) => _Placed(reference: reference, total: total));
+  return showAppSheet(context, builder: (_) => _Placed(order: order));
 }
 
 class _Placed extends StatelessWidget {
-  const _Placed({required this.reference, required this.total});
+  const _Placed({required this.order});
 
-  final String reference;
-  final int total;
+  final Order order;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +59,7 @@ class _Placed extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Order', style: context.caption),
-                      Text(reference, style: context.title),
+                      Text(order.reference, style: context.title),
                     ],
                   ),
                 ),
@@ -67,7 +67,7 @@ class _Placed extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text('Paid', style: context.caption),
-                    Text(money(total),
+                    Text(money(order.totalCents),
                         style: context.title.copyWith(color: p.accent)),
                   ],
                 ),
@@ -76,7 +76,20 @@ class _Placed extends StatelessWidget {
           ),
           const SizedBox(height: Space.xl),
           GradientButton(
-              label: 'Done', onPressed: () => Navigator.pop(context)),
+            label: 'Track order',
+            onPressed: () {
+              Navigator.pop(context);
+              openOrder(context, order.id);
+            },
+          ),
+          const SizedBox(height: Space.sm),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Done',
+                style: TextStyle(
+                    color: context.palette.inkSoft,
+                    fontWeight: FontWeight.w700)),
+          ),
         ],
       ),
     );
