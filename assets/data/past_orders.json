@@ -1,0 +1,17 @@
+[
+  {
+    "productId": "p_cheeseburger",
+    "daysAgo": 1,
+    "paidCents": 499
+  },
+  {
+    "productId": "p_ramen",
+    "daysAgo": 3,
+    "paidCents": 1250
+  },
+  {
+    "productId": "p_latte",
+    "daysAgo": 6,
+    "paidCents": 490
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "id": "n1",
+    "title": "Your rider is 5 minutes away",
+    "body": "Tunde is on Admiralty Way with your Tonkotsu Ramen.",
+    "minutesAgo": 12,
+    "read": false
+  },
+  {
+    "id": "n2",
+    "title": "TREAT30 is live",
+    "body": "Take 30% off your whole order this week on {app}. Add it at checkout or tap Apply on the deal card.",
+    "minutesAgo": 95,
+    "read": false
+  },
+  {
+    "id": "n3",
+    "title": "Umami Bar just opened near you",
+    "body": "Fresh sushi, bento and tempura, about 25 minutes from your Home address.",
+    "minutesAgo": 300,
+    "read": false
+  },
+  {
+    "id": "n4",
+    "title": "Rate your Cheese Burger",
+    "body": "How was Stack House yesterday? A quick rating helps other people pick.",
+    "minutesAgo": 1500,
+    "read": true
+  },
+  {
+    "id": "n5",
+    "title": "Order delivered",
+    "body": "Your Iced Caramel Latte from Sip Station was delivered at 9:42. We hope it was still cold.",
+    "minutesAgo": 8600,
+    "read": true
+  },
+  {
+    "id": "n6",
+    "title": "A note on delivery times this weekend",
+    "body": "Heavy rain is expected across Lekki and Victoria Island on Saturday evening. Riders will still be out, but some deliveries may take ten to fifteen minutes longer than shown. We will keep you posted in the app as your order moves, and you will not be charged extra for the wait.",
+    "minutesAgo": 10200,
+    "read": true
+  }
+]

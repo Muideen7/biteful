@@ -1,0 +1,72 @@
+[
+  {
+    "id": "burger",
+    "name": "Burger",
+    "art": {
+      "main": "burger"
+    }
+  },
+  {
+    "id": "pizza",
+    "name": "Pizza",
+    "art": {
+      "main": "pizza"
+    }
+  },
+  {
+    "id": "sushi",
+    "name": "Sushi",
+    "art": {
+      "main": "sushi"
+    }
+  },
+  {
+    "id": "chicken",
+    "name": "Chicken",
+    "art": {
+      "main": "chicken"
+    }
+  },
+  {
+    "id": "meat",
+    "name": "Meat",
+    "art": {
+      "main": "meat"
+    }
+  },
+  {
+    "id": "noodles",
+    "name": "Noodles",
+    "art": {
+      "main": "ramen"
+    }
+  },
+  {
+    "id": "pasta",
+    "name": "Pasta",
+    "art": {
+      "main": "pasta"
+    }
+  },
+  {
+    "id": "dessert",
+    "name": "Dessert",
+    "art": {
+      "main": "dessert"
+    }
+  },
+  {
+    "id": "drinks",
+    "name": "Drinks",
+    "art": {
+      "main": "bubbletea"
+    }
+  },
+  {
+    "id": "salads",
+    "name": "Salads",
+    "art": {
+      "main": "salad"
+    }
+  }
+]

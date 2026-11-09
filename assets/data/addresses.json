@@ -1,0 +1,17 @@
+[
+  {
+    "id": "a_home",
+    "label": "Home",
+    "line": "12 Admiralty Way, Lekki Phase 1, Lagos"
+  },
+  {
+    "id": "a_work",
+    "label": "Work",
+    "line": "Plot 5, Adeola Odeku Street, Victoria Island"
+  },
+  {
+    "id": "a_gym",
+    "label": "Gym",
+    "line": "3 Bourdillon Road, Ikoyi, Lagos"
+  }
+]

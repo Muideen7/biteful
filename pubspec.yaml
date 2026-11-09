@@ -1,0 +1,41 @@
+name: dishly
+description: "Dishly: a Flutter food delivery app template with hand-drawn motion."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/data/
+    - assets/images/food/
+    - assets/images/people/
+  fonts:
+    # Bricolage Grotesque, the FlutterZip house face (as in Strata). Static
+    # instances cut from the variable font by tool/cut_fonts.py, so every
+    # FontWeight maps to a real cut.
+    - family: Bricolage
+      fonts:
+        - asset: assets/fonts/Bricolage-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Bricolage-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Bricolage-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Bricolage-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Bricolage-ExtraBold.ttf
+          weight: 800
