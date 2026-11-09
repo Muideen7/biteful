@@ -54,8 +54,9 @@ Future<(ProviderContainer, Store)> makeContainer(
     ...prefs,
   });
   final store = Store(await SharedPreferences.getInstance());
-  if (signedIn != null)
+  if (signedIn != null) {
     await store.setJson(Store.session, {'email': signedIn.email});
+  }
   final container = ProviderContainer(overrides: [
     storeProvider.overrideWithValue(store),
     clockProvider.overrideWithValue(() => clock),
