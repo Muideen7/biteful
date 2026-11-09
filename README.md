@@ -22,7 +22,7 @@ live order tracking, editable profile and addresses, and dark mode.
 ![Dart](https://img.shields.io/badge/Dart-3.5+-41671B?style=flat-square&logo=dart&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20Android-5F6B52?style=flat-square)
 ![State](https://img.shields.io/badge/state-Riverpod-5F6B52?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-137%20passing-4E7A22?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-138%20passing-4E7A22?style=flat-square)
 
 <br />
 
@@ -210,7 +210,7 @@ flutter analyze
 flutter test
 ```
 
-137 tests cover the cart and order maths, search ranking, the seed's integrity (every id it references exists, every image is
+138 tests cover the cart and order maths, search ranking, the seed's integrity (every id it references exists, every image is
 bundled, no em dashes), the repositories and providers, every screen at phone size including a small
 phone at large text, the fly-to-cart flight, every order status at a pinned clock, the nested tab navigation, the
 overscroll fill on iOS, and the whole app through the splash, including a check

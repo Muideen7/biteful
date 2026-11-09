@@ -117,8 +117,7 @@ class _HomeTabState extends ConsumerState<HomeTab>
             physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
             slivers: switch (catalog) {
-              AsyncData(:final value) when _arrived => _content(value, barH),
-              AsyncData() => const [],
+              AsyncData(:final value) => _content(value, barH),
               AsyncError() => [
                   SliverToBoxAdapter(
                       child: SizedBox(height: barH + Sizes.homeHeaderReach)),
@@ -160,13 +159,19 @@ class _HomeTabState extends ConsumerState<HomeTab>
   }
 
   List<Widget> _content(Catalog c, double barH) {
-    final s = <Widget>[
+    // The search bar and the banner sit on the header and arrive with it.
+    // They are built from the first frame (both are light), so the rider
+    // flying in from sign in has its place in the banner to land in.
+    final withHeader = [
       Padding(
         padding: const EdgeInsets.fromLTRB(
             Space.gutter, 0, Space.gutter, Space.md + 2),
         child: SearchPill(onTap: () => openSearch(context)),
       ),
       PromoCarousel(banners: c.banners),
+    ];
+    // Everything below is held back until the header lands, then rises in.
+    final below = <Widget>[
       const CategoryStrip(),
       const OrderAgainStrip(),
       DealsStrip(deals: c.deals),
@@ -175,9 +180,13 @@ class _HomeTabState extends ConsumerState<HomeTab>
     ];
     return [
       SliverToBoxAdapter(child: SizedBox(height: barH + Space.xs)),
-      for (var i = 0; i < s.length; i++)
-        SliverToBoxAdapter(child: _rise(i + 1, s[i])),
-      ...BestSellers.slivers(context, ref, c, (w) => _rise(s.length + 1, w)),
+      for (final w in withHeader) SliverToBoxAdapter(child: w),
+      if (_arrived) ...[
+        for (var i = 0; i < below.length; i++)
+          SliverToBoxAdapter(child: _rise(i + 1, below[i])),
+        ...BestSellers.slivers(
+            context, ref, c, (w) => _rise(below.length + 1, w)),
+      ],
       const SliverToBoxAdapter(child: SizedBox(height: Sizes.navHeight + 48)),
     ];
   }

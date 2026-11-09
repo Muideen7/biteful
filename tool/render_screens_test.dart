@@ -57,6 +57,9 @@ Future<void> _shot(WidgetTester tester, String name) async {
   });
 }
 
+void tester_padding(WidgetTester t) =>
+    t.view.padding = const FakeViewPadding(top: 59 * 3, bottom: 34 * 3);
+
 void main() {
   final seed = readSeed();
   setUpAll(() async {
@@ -162,6 +165,38 @@ void main() {
     final bytes = File('assets/images/people/olympicson.png').readAsBytesSync();
     await app(t, AvatarCropScreen(bytes: bytes));
     await _shot(t, 'avatar_crop');
+  });
+
+  testWidgets('rider flight', (t) async {
+    phone(t);
+    tester_padding(t);
+    final (c, _) = await makeContainer(seed);
+    await t.pumpWidget(UncontrolledProviderScope(
+      container: c,
+      child: RepaintBoundary(
+        key: _key,
+        child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light(),
+            home: const SignInScreen()),
+      ),
+    ));
+    await t.pumpAndSettle();
+    Finder f(String k) => find.descendant(
+        of: find.byKey(Key(k)), matching: find.byType(EditableText));
+    await t.enterText(f('email'), 'hello@flutterzip.com');
+    await t.enterText(f('password'), 'anything1');
+    FocusManager.instance.primaryFocus?.unfocus();
+    await t.pumpAndSettle();
+    await t.tap(find.text('Log In'));
+    await t.pump();
+    await t.pump();
+    for (var i = 0; i < 8; i++) {
+      await _shot(t, 'flight_$i');
+      await t.pump(const Duration(milliseconds: 90));
+    }
+    await t.pumpAndSettle();
+    await _shot(t, 'flight_8');
   });
 
   testWidgets('restaurant', (t) async {

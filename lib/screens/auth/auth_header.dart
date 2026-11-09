@@ -7,6 +7,7 @@ import '../../config/app_theme.dart';
 import '../../config/design_tokens.dart';
 import '../../config/motion.dart';
 import '../../widgets/rider/rider.dart';
+import '../../widgets/rider/rider_hero.dart';
 import '../../widgets/rider/rider_painter.dart';
 import '../../widgets/wordmark.dart';
 import '../shell/brand_header_hero.dart';
@@ -118,11 +119,14 @@ class AuthHeader extends StatelessWidget {
           Positioned(
             right: -riderW * .08 - (1 - drive) * (riderW + 40),
             bottom: -riderW * .07,
-            child: Rider(
-              width: riderW,
-              pose: RiderPose.waving,
-              mirrored: true,
-              speed: (1 - drive) * .9,
+            // Rides into Home's delivery banner on sign in, turning round.
+            child: RiderHero(
+              child: Rider(
+                width: riderW,
+                pose: RiderPose.waving,
+                mirrored: true,
+                speed: (1 - drive) * .9,
+              ),
             ),
           ),
         ],
