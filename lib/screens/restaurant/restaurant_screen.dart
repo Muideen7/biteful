@@ -31,6 +31,9 @@ class RestaurantScreen extends ConsumerWidget {
         slivers: [
           SliverAppBar(
             pinned: true,
+            // The green header stretches on a pull-down instead of
+            // opening a gap above it.
+            stretch: true,
             expandedHeight: 230,
             backgroundColor: p.headerTop,
             foregroundColor: p.card,
@@ -89,7 +92,7 @@ class RestaurantScreen extends ConsumerWidget {
           ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(
-                Space.gutter, Space.sm, Space.gutter, Space.xxl * 2),
+                Space.gutter, Space.sm, Space.gutter, Sizes.navHeight + 56),
             sliver: SliverGrid.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,

@@ -19,10 +19,11 @@ class UserProfile {
       ? 'assets/images/${avatar.substring(6)}'
       : null;
 
-  UserProfile copyWith({String? name, String? email}) => UserProfile(
+  UserProfile copyWith({String? name, String? email, String? phone}) =>
+      UserProfile(
         name: name ?? this.name,
         email: email ?? this.email,
-        phone: phone,
+        phone: phone ?? this.phone,
         avatar: avatar,
       );
 
@@ -43,6 +44,11 @@ class Address {
   final String id;
   final String label;
   final String line;
+
+  Address copyWith({String? label, String? line}) =>
+      Address(id: id, label: label ?? this.label, line: line ?? this.line);
+
+  Map<String, dynamic> toJson() => {'id': id, 'label': label, 'line': line};
 
   factory Address.fromJson(Map<String, dynamic> j) => Address(
         id: j['id'] as String,
@@ -95,3 +101,21 @@ String daysAgoLabel(int days) => switch (days) {
       1 => 'Yesterday',
       _ => '$days days ago',
     };
+
+/// "2:05 PM".
+String clockLabel(DateTime t) {
+  final h = t.hour % 12 == 0 ? 12 : t.hour % 12;
+  return '$h:${t.minute.toString().padLeft(2, '0')} ${t.hour < 12 ? 'AM' : 'PM'}';
+}
+
+/// "Today, 2:05 PM", "Yesterday, 9:40 AM", "3 days ago".
+String whenLabel(DateTime t, DateTime now) {
+  final days = DateTime(now.year, now.month, now.day)
+      .difference(DateTime(t.year, t.month, t.day))
+      .inDays;
+  return switch (days) {
+    0 => 'Today, ${clockLabel(t)}',
+    1 => 'Yesterday, ${clockLabel(t)}',
+    _ => '$days days ago',
+  };
+}

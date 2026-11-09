@@ -5,7 +5,7 @@ import '../../../config/app_theme.dart';
 import '../../../config/design_tokens.dart';
 import '../../../models/account.dart';
 import '../../../models/money.dart';
-import '../../../providers/cart_providers.dart';
+import '../../../providers/order_providers.dart';
 import '../../../providers/core_providers.dart';
 import '../../../widgets/common.dart';
 import '../../../widgets/food_art_view.dart';
@@ -22,6 +22,7 @@ class OrderAgainStrip extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final p = context.palette;
     final orders = ref.watch(orderAgainProvider);
+    final now = ref.watch(clockProvider)();
     final products =
         ref.watch(catalogProvider).valueOrNull?.productById ?? const {};
     final visible = [
@@ -31,7 +32,8 @@ class OrderAgainStrip extends ConsumerWidget {
     if (visible.isEmpty) return const SizedBox.shrink();
     return Column(
       children: [
-        const SectionHeader('Order again'),
+        SectionHeader('Order again',
+            action: 'My orders', onAction: () => openOrders(context)),
         HStrip(
           height: 74,
           itemCount: visible.length,
@@ -41,7 +43,7 @@ class OrderAgainStrip extends ConsumerWidget {
             return Pressable(
               onTap: () => openProduct(context, product),
               semanticLabel:
-                  '${product.name}, ordered ${daysAgoLabel(o.daysAgo)}',
+                  '${product.name}, ordered ${whenLabel(o.orderedAt, now)}',
               child: SoftCard(
                 padding: const EdgeInsets.fromLTRB(
                     Space.md, Space.sm, Space.sm, Space.sm),
@@ -64,7 +66,7 @@ class OrderAgainStrip extends ConsumerWidget {
                                 style: context.title.copyWith(fontSize: 13.5)),
                             const SizedBox(height: 2),
                             Text(
-                              '${daysAgoLabel(o.daysAgo)} · ${money(o.paidCents)}',
+                              '${_ago(o.orderedAt, now)} · ${money(o.unitCents)}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: context.caption,
@@ -80,7 +82,7 @@ class OrderAgainStrip extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(10),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(10),
-                            onTap: () => reorder(context, ref, o,
+                            onTap: () => reorderDish(context, ref, o,
                                 from: GlobalObjectKey('again-${o.productId}')),
                             child: SizedBox.square(
                               dimension: 34,
@@ -100,4 +102,12 @@ class OrderAgainStrip extends ConsumerWidget {
       ],
     );
   }
+}
+
+/// "Today", "Yesterday", "3 days ago": short enough for the card.
+String _ago(DateTime t, DateTime now) {
+  final days = DateTime(now.year, now.month, now.day)
+      .difference(DateTime(t.year, t.month, t.day))
+      .inDays;
+  return daysAgoLabel(days);
 }

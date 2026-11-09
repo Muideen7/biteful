@@ -11,6 +11,8 @@ import '../../services/catalog_repository.dart';
 import '../../providers/core_providers.dart';
 import '../../widgets/common.dart';
 import '../auth/auth_header.dart';
+import '../actions.dart';
+import '../search/search_screen.dart';
 import 'home_header.dart';
 import 'sections/best_sellers.dart';
 import 'sections/category_strip.dart';
@@ -143,6 +145,11 @@ class _HomeTabState extends ConsumerState<HomeTab>
 
   List<Widget> _content(Catalog c, double barH) {
     final s = <Widget>[
+      Padding(
+        padding: const EdgeInsets.fromLTRB(
+            Space.gutter, 0, Space.gutter, Space.md + 2),
+        child: SearchPill(onTap: () => openSearch(context)),
+      ),
       PromoCarousel(banners: c.banners),
       const CategoryStrip(),
       const OrderAgainStrip(),

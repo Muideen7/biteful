@@ -16,6 +16,22 @@ enum ShellTab { home, saved, cart, offers, profile }
 
 final shellTabProvider = StateProvider<ShellTab>((_) => ShellTab.home);
 
+/// One navigator per tab. Pages pushed from a tab (a restaurant, an order,
+/// search) open inside it, so the navigation bar stays, the cart icon is
+/// always there for a dish to fly into, and each tab keeps its own history.
+final tabNavigatorKeys = {
+  for (final t in ShellTab.values)
+    t: GlobalKey<NavigatorState>(debugLabel: 'tab-${t.name}'),
+};
+
+/// The navigator of the tab on screen. Use it from anywhere, including a
+/// sheet that lives on the root navigator, to open a page within the shell.
+NavigatorState tabNavigator(BuildContext context) {
+  final tab =
+      ProviderScope.containerOf(context, listen: false).read(shellTabProvider);
+  return tabNavigatorKeys[tab]!.currentState ?? Navigator.of(context);
+}
+
 /// Home, Saved, Cart, Offers and Profile. Tabs keep their state and scroll
 /// position when you move between them.
 class MainShell extends ConsumerStatefulWidget {
@@ -39,6 +55,21 @@ class _MainShellState extends ConsumerState<MainShell> {
         ShellTab.profile => const ProfileTab(),
       };
 
+  Widget _tab(ShellTab t) {
+    final key = tabNavigatorKeys[t]!;
+    // Android back and the iOS edge swipe pop inside the tab first.
+    return NavigatorPopHandler<Object?>(
+      onPopWithResult: (_) => key.currentState?.maybePop(),
+      child: Navigator(
+        key: key,
+        // Nested navigators need their own controller for Heroes to fly.
+        observers: [HeroController()],
+        onGenerateRoute: (settings) =>
+            MaterialPageRoute(settings: settings, builder: (_) => _page(t)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final tab = ref.watch(shellTabProvider);
@@ -49,7 +80,7 @@ class _MainShellState extends ConsumerState<MainShell> {
         index: tab.index,
         children: [
           for (final t in ShellTab.values)
-            _visited.contains(t) ? _page(t) : const SizedBox.shrink(),
+            _visited.contains(t) ? _tab(t) : const SizedBox.shrink(),
         ],
       ),
       bottomNavigationBar: const _NavBar(),
@@ -120,8 +151,15 @@ class _NavBar extends ConsumerWidget {
                     selected: tab == current,
                     badge: tab == ShellTab.cart ? count : 0,
                     isCart: tab == ShellTab.cart,
-                    onTap: () =>
-                        ref.read(shellTabProvider.notifier).state = tab,
+                    onTap: () {
+                      // Tapping the tab you are on goes back to its first page.
+                      if (tab == current) {
+                        tabNavigatorKeys[tab]!
+                            .currentState
+                            ?.popUntil((r) => r.isFirst);
+                      }
+                      ref.read(shellTabProvider.notifier).state = tab;
+                    },
                   ),
                 ),
             ],

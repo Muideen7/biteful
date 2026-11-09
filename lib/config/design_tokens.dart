@@ -29,7 +29,7 @@ abstract final class Sizes {
   static const homeBar = 64.0;
 
   /// How far the green header reaches behind the promo banner at rest.
-  static const homeHeaderReach = 96.0;
+  static const homeHeaderReach = 158.0;
 
   static const bannerAspect = 2.25;
   static const categoryTile = 74.0;

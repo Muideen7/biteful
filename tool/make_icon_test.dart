@@ -26,7 +26,8 @@ void main() {
         ).createShader(const Rect.fromLTWH(0, 0, s, s)),
     );
     // A soft pale disc behind the rider, like the blob in the app.
-    c.drawCircle(const Offset(s * .52, s * .5), s * .36, Paint()..color = const Color(0xFFE7F3C9));
+    c.drawCircle(const Offset(s * .52, s * .5), s * .36,
+        Paint()..color = const Color(0xFFE7F3C9));
     const w = s * .86;
     final h = w * RiderPainter.design.height / RiderPainter.design.width;
     c.save();
@@ -36,6 +37,7 @@ void main() {
     final img = await rec.endRecording().toImage(s.toInt(), s.toInt());
     final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
     Directory('assets/brand').createSync(recursive: true);
-    File('assets/brand/icon_1024.png').writeAsBytesSync(bytes!.buffer.asUint8List());
+    File('assets/brand/icon_1024.png')
+        .writeAsBytesSync(bytes!.buffer.asUint8List());
   });
 }

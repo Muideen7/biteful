@@ -20,7 +20,7 @@ class Seed {
     required this.restaurants,
     required this.deals,
     required this.banners,
-    required this.pastOrders,
+    required this.orders,
     required this.profile,
     required this.addresses,
     required this.notifications,
@@ -33,7 +33,7 @@ class Seed {
   final List<Restaurant> restaurants;
   final List<Deal> deals;
   final List<PromoBanner> banners;
-  final List<PastOrder> pastOrders;
+  final List<SeedOrder> orders;
   final UserProfile profile;
   final List<Address> addresses;
   final List<AppNotification> notifications;
@@ -49,7 +49,7 @@ class Seed {
     'restaurants',
     'deals',
     'banners',
-    'past_orders',
+    'orders',
     'profile',
     'auth',
     'addresses',
@@ -71,7 +71,7 @@ class Seed {
       restaurants: list('restaurants', Restaurant.fromJson),
       deals: list('deals', Deal.fromJson),
       banners: list('banners', PromoBanner.fromJson),
-      pastOrders: list('past_orders', PastOrder.fromJson),
+      orders: list('orders', SeedOrder.fromJson),
       profile: UserProfile.fromJson(read('profile') as Map<String, dynamic>),
       addresses: list('addresses', Address.fromJson),
       notifications: list('notifications', AppNotification.fromJson),

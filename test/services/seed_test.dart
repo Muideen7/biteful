@@ -38,8 +38,10 @@ void main() {
       expect(cats, contains(p.categoryId), reason: p.id);
       expect(rests, contains(p.restaurantId), reason: p.id);
     }
-    for (final o in seed.pastOrders) {
-      expect(prods, contains(o.productId));
+    for (final o in seed.orders) {
+      for (final l in o.stampedAt(DateTime(2026)).lines) {
+        expect(prods, contains(l.productId));
+      }
     }
     for (final b in seed.banners) {
       if (b.dealId != null) expect(deals, contains(b.dealId));
@@ -79,6 +81,9 @@ void main() {
     expect(seed.notifications.any((n) => n.read), isTrue);
     expect(seed.notifications.any((n) => !n.read), isTrue);
     expect(seed.deals.any((d) => d.minSpendCents > 0), isTrue);
+    // One order young enough to be live right after install.
+    expect(seed.orders.any((o) => o.minutesAgo < 20), isTrue);
+    expect(seed.orders.any((o) => o.minutesAgo > 20), isTrue);
   });
 
   test('seed copy has no em dashes', () {

@@ -15,27 +15,159 @@ class CartLine {
   Map<String, dynamic> toJson() => {'productId': productId, 'qty': qty};
 }
 
-class PastOrder {
-  const PastOrder({
-    required this.productId,
-    required this.daysAgo,
-    required this.paidCents,
-  });
+class OrderLine {
+  const OrderLine(
+      {required this.productId, required this.qty, required this.unitCents});
 
   final String productId;
-  final int daysAgo;
+  final int qty;
 
-  /// What it cost then, which need not be today's price.
-  final int paidCents;
+  /// The price when it was ordered, which need not be today's.
+  final int unitCents;
 
-  factory PastOrder.fromJson(Map<String, dynamic> j) => PastOrder(
+  int get totalCents => unitCents * qty;
+
+  factory OrderLine.fromJson(Map<String, dynamic> j) => OrderLine(
         productId: j['productId'] as String,
-        daysAgo: j['daysAgo'] as int,
-        paidCents: j['paidCents'] as int,
+        qty: j['qty'] as int,
+        unitCents: j['unitCents'] as int,
       );
 
   Map<String, dynamic> toJson() =>
-      {'productId': productId, 'daysAgo': daysAgo, 'paidCents': paidCents};
+      {'productId': productId, 'qty': qty, 'unitCents': unitCents};
+}
+
+enum OrderStatus { preparing, onTheWay, delivered }
+
+/// A placed order. Its status is never stored: it is read off the clock,
+/// so the list, the detail screen and Order again always agree.
+class Order {
+  const Order({
+    required this.id,
+    required this.reference,
+    required this.placedAt,
+    required this.lines,
+    required this.deliveryCents,
+    required this.discountCents,
+    required this.addressLabel,
+    this.dealCode,
+  });
+
+  final String id;
+  final String reference;
+  final DateTime placedAt;
+  final List<OrderLine> lines;
+  final int deliveryCents;
+  final int discountCents;
+  final String addressLabel;
+  final String? dealCode;
+
+  /// The kitchen's time, then the ride.
+  static const prepTime = Duration(minutes: 6);
+  static const rideTime = Duration(minutes: 14);
+
+  int get itemCount => lines.fold(0, (n, l) => n + l.qty);
+  int get subtotalCents => lines.fold(0, (n, l) => n + l.totalCents);
+  int get totalCents => subtotalCents + deliveryCents - discountCents;
+
+  DateTime get pickedUpAt => placedAt.add(prepTime);
+  DateTime get deliveredAt => pickedUpAt.add(rideTime);
+
+  OrderStatus statusAt(DateTime now) {
+    if (now.isBefore(pickedUpAt)) return OrderStatus.preparing;
+    if (now.isBefore(deliveredAt)) return OrderStatus.onTheWay;
+    return OrderStatus.delivered;
+  }
+
+  bool isActiveAt(DateTime now) => statusAt(now) != OrderStatus.delivered;
+
+  /// 0..1 from placed to delivered.
+  double progressAt(DateTime now) {
+    final total = deliveredAt.difference(placedAt).inSeconds;
+    final done = now.difference(placedAt).inSeconds;
+    return (done / total).clamp(0.0, 1.0);
+  }
+
+  /// Whole minutes until delivery, at least 1 while it is still coming.
+  int minutesLeftAt(DateTime now) {
+    final s = deliveredAt.difference(now).inSeconds;
+    return s <= 0 ? 0 : (s / 60).ceil();
+  }
+
+  factory Order.fromJson(Map<String, dynamic> j, {DateTime? placedAt}) => Order(
+        id: j['id'] as String,
+        reference: j['reference'] as String,
+        placedAt: placedAt ??
+            DateTime.fromMillisecondsSinceEpoch(j['placedAt'] as int),
+        lines: [
+          for (final l in j['lines'] as List)
+            OrderLine.fromJson(l as Map<String, dynamic>),
+        ],
+        deliveryCents: j['deliveryCents'] as int,
+        discountCents: j['discountCents'] as int,
+        addressLabel: j['addressLabel'] as String,
+        dealCode: j['dealCode'] as String?,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'reference': reference,
+        'placedAt': placedAt.millisecondsSinceEpoch,
+        'lines': [for (final l in lines) l.toJson()],
+        'deliveryCents': deliveryCents,
+        'discountCents': discountCents,
+        'addressLabel': addressLabel,
+        if (dealCode != null) 'dealCode': dealCode,
+      };
+}
+
+/// A seeded order: its age, not its date, so the seed never goes stale.
+/// Stamped into a real [Order] against the first-launch time.
+class SeedOrder {
+  const SeedOrder(this.minutesAgo, this.json);
+
+  final int minutesAgo;
+  final Map<String, dynamic> json;
+
+  Order stampedAt(DateTime firstLaunch) => Order.fromJson(json,
+      placedAt: firstLaunch.subtract(Duration(minutes: minutesAgo)));
+
+  factory SeedOrder.fromJson(Map<String, dynamic> j) =>
+      SeedOrder(j['minutesAgo'] as int, j);
+}
+
+/// One card per dish in Order again: the dish, when it was last ordered and
+/// what it cost then.
+class RecentDish {
+  const RecentDish(
+      {required this.productId,
+      required this.orderedAt,
+      required this.unitCents});
+
+  final String productId;
+  final DateTime orderedAt;
+  final int unitCents;
+
+  /// Most recent order first, each dish once.
+  static List<RecentDish> from(List<Order> newestFirst) {
+    final seen = <String>{};
+    return [
+      for (final o in newestFirst)
+        for (final l in o.lines)
+          if (seen.add(l.productId))
+            RecentDish(
+                productId: l.productId,
+                orderedAt: o.placedAt,
+                unitCents: l.unitCents),
+    ];
+  }
+}
+
+/// Unique even when two are made in the same millisecond.
+abstract final class Ids {
+  static int _counter = 0;
+  static String next(String prefix) =>
+      '${prefix}_${DateTime.now().millisecondsSinceEpoch}_${_counter++}';
 }
 
 /// Why a deal does not apply to the current basket, if it does not.

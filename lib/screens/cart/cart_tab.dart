@@ -7,7 +7,9 @@ import '../../models/catalog.dart';
 import '../../models/money.dart';
 import '../../models/order.dart';
 import '../../providers/cart_providers.dart';
+import '../../providers/account_providers.dart';
 import '../../providers/core_providers.dart';
+import '../../providers/order_providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/food_art_view.dart';
 import '../../widgets/gradient_button.dart';
@@ -32,25 +34,35 @@ class _CartTabState extends ConsumerState<CartTab> {
     final deal = ref.read(appliedDealObjectProvider);
     final totals = ref.read(cartTotalsProvider);
     setState(() => _placing = true);
-    final reference = await ref.read(orderRepositoryProvider).place(
-          lines,
-          dealCode: totals.dealCheck is DealOk ? deal?.code : null,
-        );
-    await ref.read(placedOrdersProvider.notifier).record([
-      for (final l in lines)
-        PastOrder(
-            productId: l.productId,
-            daysAgo: 0,
-            paidCents: catalog.productById[l.productId]!.priceCents * l.qty),
-    ]);
+    final reference =
+        await (await ref.read(orderRepositoryProvider.future)).place(
+      lines,
+      dealCode: totals.dealCheck is DealOk ? deal?.code : null,
+    );
+    final order = Order(
+      id: Ids.next('o'),
+      reference: reference,
+      placedAt: ref.read(clockProvider)(),
+      lines: [
+        for (final l in lines)
+          OrderLine(
+              productId: l.productId,
+              qty: l.qty,
+              unitCents: catalog.productById[l.productId]!.priceCents),
+      ],
+      deliveryCents: totals.deliveryCents,
+      discountCents: totals.discountCents,
+      addressLabel: ref.read(currentAddressProvider)?.label ?? 'Home',
+      dealCode: totals.dealCheck is DealOk ? deal?.code : null,
+    );
+    await ref.read(placedOrdersProvider.notifier).add(order);
     await ref.read(cartProvider.notifier).clear();
     if (totals.dealCheck is DealOk) {
       await ref.read(appliedDealProvider.notifier).apply(null);
     }
     if (!mounted) return;
     setState(() => _placing = false);
-    await showOrderPlacedSheet(context,
-        reference: reference, total: totals.totalCents);
+    await showOrderPlacedSheet(context, order: order);
   }
 
   @override

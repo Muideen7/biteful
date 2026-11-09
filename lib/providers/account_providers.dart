@@ -4,9 +4,52 @@ import '../models/account.dart';
 import '../services/store.dart';
 import 'core_providers.dart';
 
-final addressesProvider = FutureProvider<List<Address>>(
-  (ref) async => (await ref.watch(seedProvider.future)).addresses,
-);
+/// Saved addresses. They come from the account repository until the person
+/// edits them; from then on their own list is kept, and each change is also
+/// sent to the repository.
+class AddressesNotifier extends AsyncNotifier<List<Address>> {
+  @override
+  Future<List<Address>> build() async {
+    final saved = ref.watch(storeProvider).json<List<dynamic>>(Store.addresses);
+    if (saved != null) {
+      return [
+        for (final j in saved) Address.fromJson(j as Map<String, dynamic>)
+      ];
+    }
+    return (await ref.watch(accountRepositoryProvider.future)).addresses();
+  }
+
+  /// Adds [a], or replaces the address with the same id.
+  Future<void> save(Address a) async {
+    final saved =
+        await (await ref.read(accountRepositoryProvider.future)).saveAddress(a);
+    final list = await future;
+    final exists = list.any((x) => x.id == saved.id);
+    await _set([
+      for (final x in list) x.id == saved.id ? saved : x,
+      if (!exists) saved,
+    ]);
+  }
+
+  Future<void> remove(String id) async {
+    await (await ref.read(accountRepositoryProvider.future)).deleteAddress(id);
+    await _set([
+      for (final x in await future)
+        if (x.id != id) x
+    ]);
+  }
+
+  Future<void> _set(List<Address> next) async {
+    state = AsyncData(next);
+    await ref
+        .read(storeProvider)
+        .setJson(Store.addresses, [for (final a in next) a.toJson()]);
+  }
+}
+
+final addressesProvider =
+    AsyncNotifierProvider<AddressesNotifier, List<Address>>(
+        AddressesNotifier.new);
 
 class SelectedAddressNotifier extends Notifier<String?> {
   @override
@@ -59,12 +102,17 @@ final readMarksProvider =
     NotifierProvider<ReadMarksNotifier, Map<String, bool>>(
         ReadMarksNotifier.new);
 
+final notificationFeedProvider = FutureProvider<List<AppNotification>>(
+  (ref) async =>
+      (await ref.watch(accountRepositoryProvider.future)).notifications(),
+);
+
 final notificationsProvider = Provider<List<AppNotification>>((ref) {
-  final seed = ref.watch(seedProvider).valueOrNull;
-  if (seed == null) return const [];
+  final feed = ref.watch(notificationFeedProvider).valueOrNull;
+  if (feed == null) return const [];
   final marks = ref.watch(readMarksProvider);
   return [
-    for (final n in seed.notifications) n.copyWith(read: marks[n.id] ?? n.read),
+    for (final n in feed) n.copyWith(read: marks[n.id] ?? n.read),
   ];
 });
 

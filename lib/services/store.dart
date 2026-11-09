@@ -18,8 +18,14 @@ class Store {
   static const saved = 'saved';
   static const deal = 'deal';
   static const address = 'address';
+  static const addresses = 'addresses';
   static const readNotifications = 'read_notifications';
   static const placedOrders = 'placed_orders';
+
+  /// When the seed's relative times were turned into dates: first launch,
+  /// or the last reset.
+  static const seedStamp = 'seed_stamp';
+  static const recentSearches = 'recent_searches';
   static const themeMode = 'theme_mode';
 
   static const all = [
@@ -28,8 +34,11 @@ class Store {
     saved,
     deal,
     address,
+    addresses,
     readNotifications,
     placedOrders,
+    seedStamp,
+    recentSearches,
     themeMode,
   ];
 

@@ -6,12 +6,15 @@ import '../../config/design_tokens.dart';
 import '../../providers/account_providers.dart';
 import '../../providers/cart_providers.dart';
 import '../../providers/core_providers.dart';
+import '../../providers/order_providers.dart';
+import '../../providers/reset.dart';
 import '../../providers/session_providers.dart';
 import '../../widgets/avatar.dart';
 import '../../widgets/common.dart';
 import '../auth/sign_in_screen.dart';
-import '../home/address_sheet.dart';
-import '../home/sections/category_strip.dart';
+import '../actions.dart';
+import 'addresses_screen.dart';
+import 'edit_profile_sheet.dart';
 import '../routes.dart';
 import '../shell/main_shell.dart';
 import '../shell/tab_page.dart';
@@ -23,7 +26,7 @@ class ProfileTab extends ConsumerWidget {
     await ref.read(sessionProvider.notifier).signOut();
     ref.read(shellTabProvider.notifier).state = ShellTab.home;
     if (context.mounted) {
-      Navigator.of(context)
+      Navigator.of(context, rootNavigator: true)
           .pushAndRemoveUntil(fadeRoute(const SignInScreen()), (_) => false);
     }
   }
@@ -31,23 +34,10 @@ class ProfileTab extends ConsumerWidget {
   /// Back to a first launch: cart, saved, orders, deal, address, read marks
   /// and the session all go, so the whole flow can be shown again.
   Future<void> _reset(BuildContext context, WidgetRef ref) async {
-    await ref.read(storeProvider).reset();
-    for (final p in [
-      sessionProvider,
-      cartProvider,
-      savedProvider,
-      appliedDealProvider,
-      placedOrdersProvider,
-      selectedAddressIdProvider,
-      readMarksProvider,
-      themeModeProvider,
-    ]) {
-      ref.invalidate(p);
-    }
-    ref.invalidate(selectedCategoryProvider);
+    await resetDemoData(ref);
     ref.read(shellTabProvider.notifier).state = ShellTab.home;
     if (context.mounted) {
-      Navigator.of(context)
+      Navigator.of(context, rootNavigator: true)
           .pushAndRemoveUntil(fadeRoute(const SignInScreen()), (_) => false);
     }
   }
@@ -58,7 +48,9 @@ class ProfileTab extends ConsumerWidget {
     final profile = ref.watch(sessionProvider);
     final address = ref.watch(currentAddressProvider);
     final mode = ref.watch(themeModeProvider);
-    final orders = ref.watch(orderAgainProvider).length;
+    final orders = ref.watch(ordersProvider);
+    final live =
+        orders.where((o) => o.isActiveAt(ref.watch(clockProvider)())).length;
     final saved = ref.watch(savedProvider).length;
 
     return TabPage(
@@ -87,6 +79,13 @@ class ProfileTab extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  if (profile != null)
+                    IconButton.filledTonal(
+                      tooltip: 'Edit profile',
+                      onPressed: () => showEditProfileSheet(context, profile),
+                      icon: Icon(Icons.edit_outlined,
+                          color: p.accentDeep, size: 20),
+                    ),
                 ],
               ),
             ),
@@ -94,7 +93,11 @@ class ProfileTab extends ConsumerWidget {
             Row(
               children: [
                 Expanded(
-                    child: _Stat(value: '$orders', label: 'Dishes ordered')),
+                  child: GestureDetector(
+                    onTap: () => openOrders(context),
+                    child: _Stat(value: '${orders.length}', label: 'Orders'),
+                  ),
+                ),
                 const SizedBox(width: Space.md),
                 Expanded(child: _Stat(value: '$saved', label: 'Saved')),
               ],
@@ -103,16 +106,29 @@ class ProfileTab extends ConsumerWidget {
             Text('Account', style: context.heading),
             const SizedBox(height: Space.sm),
             _Row(
-              icon: Icons.location_on_outlined,
-              title: 'Delivery address',
-              value:
-                  address == null ? null : '${address.label}, ${address.line}',
-              onTap: () => showAddressSheet(context),
+              icon: Icons.receipt_long_outlined,
+              title: 'My orders',
+              value: live > 0 ? '$live on the way' : '${orders.length} orders',
+              onTap: () => openOrders(context),
             ),
             _Row(
-                icon: Icons.phone_outlined,
-                title: 'Phone',
-                value: profile?.phone),
+              icon: Icons.location_on_outlined,
+              title: 'Addresses',
+              value: address == null
+                  ? null
+                  : 'Delivering to ${address.label}, ${address.line}',
+              onTap: () => tabNavigator(context)
+                  .push(riseRoute(const AddressesScreen())),
+            ),
+            _Row(
+              icon: Icons.person_outline_rounded,
+              title: 'Personal details',
+              value:
+                  profile == null ? null : '${profile.name} · ${profile.phone}',
+              onTap: profile == null
+                  ? null
+                  : () => showEditProfileSheet(context, profile),
+            ),
             const SizedBox(height: Space.xl),
             Text('Appearance', style: context.heading),
             const SizedBox(height: Space.md),
@@ -140,7 +156,7 @@ class ProfileTab extends ConsumerWidget {
             _Row(
               icon: Icons.restart_alt_rounded,
               title: 'Reset demo data',
-              value: 'Clears your cart, saved dishes and orders',
+              value: 'Clears your cart, saved dishes, orders and edits',
               onTap: () => _reset(context, ref),
             ),
             _Row(

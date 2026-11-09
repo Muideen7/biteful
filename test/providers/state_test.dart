@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:dishly/providers/account_providers.dart';
 import 'package:dishly/providers/cart_providers.dart';
 import 'package:dishly/providers/core_providers.dart';
 import 'package:dishly/providers/session_providers.dart';
 import 'package:dishly/services/store.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:dishly/models/account.dart';
 import 'package:dishly/models/order.dart';
+import 'package:dishly/providers/order_providers.dart';
 
 import '../helpers.dart';
 
@@ -48,17 +52,98 @@ void main() {
     expect(c.read(appliedDealProvider), isNull);
   });
 
-  test('order again puts new orders first and shows each dish once', () async {
+  test('order again is derived from orders: newest first, each dish once',
+      () async {
     final (c, _) = await makeContainer(seed);
-    await c.read(seedProvider.future);
-    await c.read(placedOrdersProvider.notifier).record(const [
-      PastOrder(productId: 'p_ramen', daysAgo: 0, paidCents: 1250),
-      PastOrder(productId: 'p_boba', daysAgo: 0, paidCents: 550),
-    ]);
+    await c.read(orderHistoryProvider.future);
+    expect(c.read(orderAgainProvider).first.productId, 'p_ramen');
+    await c.read(placedOrdersProvider.notifier).add(Order(
+          id: 'o_new',
+          reference: 'DL-1',
+          placedAt: testNow.add(const Duration(minutes: 1)),
+          lines: const [
+            OrderLine(productId: 'p_boba', qty: 1, unitCents: 550),
+            OrderLine(productId: 'p_ramen', qty: 1, unitCents: 1250),
+          ],
+          deliveryCents: 0,
+          discountCents: 0,
+          addressLabel: 'Home',
+        ));
     final ids = c.read(orderAgainProvider).map((o) => o.productId).toList();
-    expect(ids.take(2), ['p_ramen', 'p_boba']);
+    expect(ids.take(2), ['p_boba', 'p_ramen']);
     expect(ids.where((i) => i == 'p_ramen').length, 1);
-    expect(c.read(orderAgainProvider).first.daysAgo, 0);
+    expect(c.read(ordersProvider).first.id, 'o_new');
+  });
+
+  test('seed orders are stamped once, at first launch, and age from there',
+      () async {
+    final launch = DateTime(2026, 11, 1, 9);
+    final (c, store) = await makeContainer(seed, firstLaunch: launch);
+    await c.read(orderHistoryProvider.future);
+    final live = c.read(ordersProvider).firstWhere((o) => o.id == 'o_live');
+    expect(live.placedAt, launch.subtract(const Duration(minutes: 3)));
+    // Eight days later it is long delivered: nothing is re-stamped on load.
+    expect(live.statusAt(testNow), OrderStatus.delivered);
+    expect(store.string(Store.seedStamp), '${launch.millisecondsSinceEpoch}');
+  });
+
+  test('addresses: add, edit, remove, and they persist', () async {
+    final (c, store) = await makeContainer(seed);
+    final n = c.read(addressesProvider.notifier);
+    final start = await c.read(addressesProvider.future);
+    await n.save(const Address(
+        id: 'a_new', label: 'Mum', line: '4 Bode Thomas, Surulere'));
+    await n.save(start.first.copyWith(line: '1 New Street, Lekki'));
+    await n.remove(start.last.id);
+    final list = c.read(addressesProvider).value!;
+    expect(list.map((a) => a.id), [start.first.id, start[1].id, 'a_new']);
+    expect(list.first.line, '1 New Street, Lekki');
+    final (c2, _) = await makeContainer(seed,
+        prefs: {Store.addresses: store.string(Store.addresses)!});
+    expect((await c2.read(addressesProvider.future)).last.label, 'Mum');
+  });
+
+  test('profile edits go through the session and are remembered', () async {
+    final (c, store) = await makeContainer(seed, signedIn: seed.profile);
+    await c
+        .read(sessionProvider.notifier)
+        .updateProfile(seed.profile.copyWith(phone: '+1 555 000 1111'));
+    expect(c.read(sessionProvider)!.phone, '+1 555 000 1111');
+    expect(store.string(Store.session), contains('+1 555 000 1111'));
+  });
+
+  test('reset brings back the seed, re-stamped', () async {
+    final (c, store) = await makeContainer(seed);
+    await c.read(placedOrdersProvider.notifier).add(Order(
+        id: 'o_x',
+        reference: 'DL-2',
+        placedAt: testNow,
+        lines: const [],
+        deliveryCents: 0,
+        discountCents: 0,
+        addressLabel: 'Home'));
+    await store.reset();
+    c.invalidate(placedOrdersProvider);
+    c.invalidate(seedStampProvider);
+    expect(c.read(placedOrdersProvider), isEmpty);
+    expect(c.read(seedStampProvider), testNow);
+    expect(store.string(Store.seedStamp), isNotNull);
+  });
+
+  test('orders stored by an older version are skipped, not fatal', () async {
+    final good = Order(
+        id: 'o_ok',
+        reference: 'DL-9',
+        placedAt: testNow,
+        lines: const [],
+        deliveryCents: 0,
+        discountCents: 0,
+        addressLabel: 'Home');
+    final (c, _) = await makeContainer(seed, prefs: {
+      Store.placedOrders:
+          '[{"productId":"p_ramen","daysAgo":0,"paidCents":1250}, ${jsonEncode(good.toJson())}]',
+    });
+    expect(c.read(placedOrdersProvider).map((o) => o.id), ['o_ok']);
   });
 
   test('saved toggles', () async {
@@ -71,7 +156,7 @@ void main() {
 
   test('notification marks override the seed both ways and persist', () async {
     final (c, store) = await makeContainer(seed);
-    await c.read(seedProvider.future);
+    await c.read(notificationFeedProvider.future);
     final unread = c.read(unreadCountProvider);
     expect(unread, seed.notifications.where((n) => !n.read).length);
     await c.read(readMarksProvider.notifier).mark('n1', read: true);
@@ -80,7 +165,7 @@ void main() {
     final (c2, _) = await makeContainer(seed, prefs: {
       Store.readNotifications: store.strings(Store.readNotifications)
     });
-    await c2.read(seedProvider.future);
+    await c2.read(notificationFeedProvider.future);
     expect(c2.read(notificationsProvider).firstWhere((n) => n.id == 'n5').read,
         isFalse);
   });
