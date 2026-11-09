@@ -149,7 +149,8 @@ class EmptyState extends StatelessWidget {
               style: FilledButton.styleFrom(
                 backgroundColor: p.accent,
                 foregroundColor: p.card,
-                textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                textStyle: const TextStyle(
+                    fontFamily: AppTheme.font, fontWeight: FontWeight.w700),
                 shape: const StadiumBorder(),
               ),
               child: Text(action!),

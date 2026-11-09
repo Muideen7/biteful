@@ -14,6 +14,7 @@ import '../../widgets/common.dart';
 import '../auth/sign_in_screen.dart';
 import '../actions.dart';
 import 'addresses_screen.dart';
+import 'avatar_sheet.dart';
 import 'edit_profile_sheet.dart';
 import '../routes.dart';
 import '../shell/main_shell.dart';
@@ -64,7 +65,40 @@ class ProfileTab extends ConsumerWidget {
               padding: const EdgeInsets.all(Space.lg),
               child: Row(
                 children: [
-                  Avatar(profile: profile, size: 60),
+                  // The photo is the button: tap it to change it, as people
+                  // expect, with a camera badge saying so.
+                  Semantics(
+                    button: true,
+                    label: 'Change profile photo',
+                    child: GestureDetector(
+                      key: AvatarKeys.avatar,
+                      onTap: profile == null
+                          ? null
+                          : () => showAvatarSheet(context,
+                              hasPhoto: profile.avatar.isNotEmpty),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Avatar(profile: profile, size: 64),
+                          Positioned(
+                            right: -2,
+                            bottom: -2,
+                            child: Container(
+                              width: 26,
+                              height: 26,
+                              decoration: BoxDecoration(
+                                color: p.accent,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: p.card, width: 2.5),
+                              ),
+                              child: Icon(Icons.photo_camera_rounded,
+                                  size: 13, color: p.card),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(width: Space.lg),
                   Expanded(
                     child: Column(
@@ -139,7 +173,8 @@ class ProfileTab extends ConsumerWidget {
                 selectedForegroundColor: p.card,
                 foregroundColor: p.inkSoft,
                 side: BorderSide(color: p.line),
-                textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                textStyle: const TextStyle(
+                    fontFamily: AppTheme.font, fontWeight: FontWeight.w700),
               ),
               segments: const [
                 ButtonSegment(value: ThemeMode.system, label: Text('Auto')),

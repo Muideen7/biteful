@@ -6,6 +6,9 @@ import 'dart:ui' as ui;
 import 'package:dishly/config/app_theme.dart';
 import 'package:dishly/screens/auth/sign_in_screen.dart';
 import 'package:dishly/screens/restaurant/restaurant_screen.dart';
+import 'package:dishly/screens/profile/profile_tab.dart';
+import 'package:dishly/screens/profile/avatar_sheet.dart';
+import 'package:dishly/screens/profile/avatar_crop_screen.dart';
 import 'package:dishly/screens/search/search_screen.dart';
 import 'package:dishly/screens/orders/orders_screen.dart';
 import 'package:dishly/screens/orders/order_detail_screen.dart';
@@ -145,6 +148,20 @@ void main() {
   testWidgets('addresses', (t) async {
     await app(t, const AddressesScreen());
     await _shot(t, 'addresses');
+  });
+
+  testWidgets('profile and photo', (t) async {
+    await app(t, const ProfileTab());
+    await _shot(t, 'profile');
+    await t.tap(find.byKey(AvatarKeys.avatar));
+    await t.pumpAndSettle();
+    await _shot(t, 'avatar_sheet');
+  });
+
+  testWidgets('crop', (t) async {
+    final bytes = File('assets/images/people/olympicson.png').readAsBytesSync();
+    await app(t, AvatarCropScreen(bytes: bytes));
+    await _shot(t, 'avatar_crop');
   });
 
   testWidgets('restaurant', (t) async {
