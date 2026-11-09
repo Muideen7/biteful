@@ -104,6 +104,9 @@ void main() {
     final c = await pump(t, ShellTab.profile);
     expect(find.text(seed.profile.name), findsOneWidget);
     await t.scrollUntilVisible(find.text('Sign out'), 200);
+    // Visible is not reachable: lift it clear of the navigation bar.
+    await t.drag(find.text('Sign out'), const Offset(0, -240));
+    await t.pumpAndSettle();
     await t.tap(find.text('Sign out'));
     await t.pumpAndSettle();
     expect(find.byType(SignInScreen), findsOneWidget);
@@ -116,6 +119,8 @@ void main() {
       Store.cart: '[{"productId":"p_cola","qty":1}]'
     });
     await t.scrollUntilVisible(find.text('Reset demo data'), 200);
+    await t.drag(find.text('Reset demo data'), const Offset(0, -240));
+    await t.pumpAndSettle();
     await t.tap(find.text('Reset demo data'));
     await t.pumpAndSettle();
     expect(find.byType(SignInScreen), findsOneWidget);

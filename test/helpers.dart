@@ -47,6 +47,7 @@ Future<(ProviderContainer, Store)> makeContainer(
   UserProfile? signedIn,
   DateTime? now,
   DateTime? firstLaunch,
+  List<Override> overrides = const [],
 }) async {
   final clock = now ?? testNow;
   SharedPreferences.setMockInitialValues({
@@ -60,6 +61,7 @@ Future<(ProviderContainer, Store)> makeContainer(
   final container = ProviderContainer(overrides: [
     storeProvider.overrideWithValue(store),
     clockProvider.overrideWithValue(() => clock),
+    ...overrides,
     seedProvider.overrideWith((_) async => seed),
   ]);
   return (container, store);
