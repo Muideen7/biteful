@@ -145,7 +145,10 @@ class _SplashOverlayState extends ConsumerState<SplashOverlay>
           ignoring: tOut > .55,
           child: Opacity(
             opacity: bgFade,
-            child: ColoredBox(
+            // A Material, not a bare ColoredBox: the splash sits above the
+            // Navigator, where no Scaffold gives text a default style, and
+            // Flutter marks unstyled text with a yellow double underline.
+            child: Material(
               color: p.paper,
               child: Center(
                 child: Column(
