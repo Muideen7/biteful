@@ -124,7 +124,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
       final profile = await action(repo);
       await ref
           .read(sessionProvider.notifier)
-          .signedIn(profile, remember: _keep);
+          .signedIn(profile.email, remember: _keep);
+      await ref
+          .read(profileProvider.notifier)
+          .signedInAs(profile, isNew: _signUp);
       if (!mounted) return;
       HapticFeedback.lightImpact();
       Navigator.of(context).pushReplacement(fadeRoute(const MainShell()));

@@ -13,7 +13,12 @@ class Store {
 
   final SharedPreferences _prefs;
 
+  /// Who is signed in: just their email. Never the profile itself, which
+  /// would go stale whenever the account's details change elsewhere.
   static const session = 'session';
+
+  /// The person's own edits to their profile (the local account store).
+  static const profile = 'profile';
   static const cart = 'cart';
   static const saved = 'saved';
   static const deal = 'deal';
@@ -30,6 +35,7 @@ class Store {
 
   static const all = [
     session,
+    profile,
     cart,
     saved,
     deal,

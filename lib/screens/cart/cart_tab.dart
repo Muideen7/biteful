@@ -5,6 +5,7 @@ import '../../config/app_theme.dart';
 import '../../config/design_tokens.dart';
 import '../../models/catalog.dart';
 import '../../models/money.dart';
+import '../../models/ids.dart';
 import '../../models/order.dart';
 import '../../providers/cart_providers.dart';
 import '../../providers/account_providers.dart';

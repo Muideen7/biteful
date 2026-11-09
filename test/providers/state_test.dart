@@ -103,13 +103,52 @@ void main() {
     expect((await c2.read(addressesProvider.future)).last.label, 'Mum');
   });
 
-  test('profile edits go through the session and are remembered', () async {
+  test('profile edits go through the account repository and are remembered',
+      () async {
     final (c, store) = await makeContainer(seed, signedIn: seed.profile);
+    final p = (await c.read(profileProvider.future))!;
     await c
-        .read(sessionProvider.notifier)
-        .updateProfile(seed.profile.copyWith(phone: '+1 555 000 1111'));
-    expect(c.read(sessionProvider)!.phone, '+1 555 000 1111');
-    expect(store.string(Store.session), contains('+1 555 000 1111'));
+        .read(profileProvider.notifier)
+        .save(p.copyWith(phone: '+1 555 000 1111'));
+    expect(c.read(profileProvider).value!.phone, '+1 555 000 1111');
+    expect(store.string(Store.profile), contains('+1 555 000 1111'));
+    // The session holds the identity only, never a copy of the profile.
+    expect(store.string(Store.session), isNot(contains('555')));
+  });
+
+  test('an old session holding a whole profile does not leak its stale details',
+      () async {
+    // What builds before the split stored: the full profile, old phone included.
+    final (c, _) = await makeContainer(seed, prefs: {
+      Store.session: jsonEncode({
+        'name': 'Olympicson',
+        'email': 'hello@flutterzip.com',
+        'phone': '+234 000 000 0000',
+        'avatar': 'asset:people/man.png',
+      }),
+    });
+    expect(c.read(sessionProvider), 'hello@flutterzip.com');
+    final p = (await c.read(profileProvider.future))!;
+    expect(p.phone, seed.profile.phone);
+    expect(p.avatar, seed.profile.avatar);
+  });
+
+  test('signing in keeps saved edits and takes the email used', () async {
+    final (c, _) = await makeContainer(seed, signedIn: seed.profile);
+    final p = (await c.read(profileProvider.future))!;
+    await c
+        .read(profileProvider.notifier)
+        .save(p.copyWith(phone: '+1 222 333 4444'));
+    await c
+        .read(profileProvider.notifier)
+        .signedInAs(seed.profile.copyWith(email: 'new@x.io'), isNew: false);
+    final after = c.read(profileProvider).value!;
+    expect(after.email, 'new@x.io');
+    expect(after.phone, '+1 222 333 4444');
+    await c.read(profileProvider.notifier).signedInAs(
+        seed.profile.copyWith(name: 'Ada', email: 'ada@x.io'),
+        isNew: true);
+    expect(c.read(profileProvider).value!.name, 'Ada');
   });
 
   test('reset brings back the seed, re-stamped', () async {
@@ -174,12 +213,12 @@ void main() {
     final (c, store) = await makeContainer(seed);
     await c
         .read(sessionProvider.notifier)
-        .signedIn(seed.profile, remember: false);
+        .signedIn(seed.profile.email, remember: false);
     expect(c.read(sessionProvider), isNotNull);
     expect(store.string(Store.session), isNull);
     await c
         .read(sessionProvider.notifier)
-        .signedIn(seed.profile, remember: true);
+        .signedIn(seed.profile.email, remember: true);
     expect(store.string(Store.session), isNotNull);
     await c.read(sessionProvider.notifier).signOut();
     expect(store.string(Store.session), isNull);

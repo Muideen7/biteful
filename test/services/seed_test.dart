@@ -63,7 +63,9 @@ void main() {
         expect(File(FoodArt.path(name)).existsSync(), isTrue, reason: name);
       }
     }
-    expect(File(seed.profile.avatarAsset!).existsSync(), isTrue);
+    expect(
+        File('assets/images/${seed.profile.avatar.substring(6)}').existsSync(),
+        isTrue);
   });
 
   test('the product name placeholder is substituted', () {

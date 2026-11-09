@@ -70,7 +70,7 @@ class _BarContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final p = context.palette;
-    final profile = ref.watch(sessionProvider);
+    final profile = ref.watch(profileProvider).valueOrNull;
     final address = ref.watch(currentAddressProvider);
     final unread = ref.watch(unreadCountProvider);
     final onGreen = p.card;

@@ -48,7 +48,8 @@ void main() {
     expect(find.byType(SignInScreen), findsOneWidget);
   });
 
-  testWidgets('splash text has a real text style, not the unstyled fallback', (t) async {
+  testWidgets('splash text has a real text style, not the unstyled fallback',
+      (t) async {
     await launch(t);
     await t.pump(AppTiming.splashDriveIn + const Duration(milliseconds: 300));
     final tagline = find.text(AppBrand.tagline);
