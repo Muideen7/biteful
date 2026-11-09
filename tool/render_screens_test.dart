@@ -57,7 +57,7 @@ Future<void> _shot(WidgetTester tester, String name) async {
   });
 }
 
-void tester_padding(WidgetTester t) =>
+void phonePadding(WidgetTester t) =>
     t.view.padding = const FakeViewPadding(top: 59 * 3, bottom: 34 * 3);
 
 void main() {
@@ -169,7 +169,7 @@ void main() {
 
   testWidgets('rider flight', (t) async {
     phone(t);
-    tester_padding(t);
+    phonePadding(t);
     final (c, _) = await makeContainer(seed);
     await t.pumpWidget(UncontrolledProviderScope(
       container: c,
