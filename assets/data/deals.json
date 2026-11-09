@@ -1,0 +1,54 @@
+[
+  {
+    "id": "d_whole",
+    "code": "TREAT30",
+    "eyebrow": "Your whole order",
+    "headline": "30% OFF",
+    "kind": "percent",
+    "value": 30,
+    "minSpendCents": 1500,
+    "art": {
+      "main": "pizza"
+    },
+    "terms": "On orders of $15 or more."
+  },
+  {
+    "id": "d_ship",
+    "code": "FREESHIP",
+    "eyebrow": "Delivery fee",
+    "headline": "FREE",
+    "kind": "freeDelivery",
+    "value": 0,
+    "minSpendCents": 0,
+    "art": {
+      "main": "takeout"
+    },
+    "terms": "Free delivery from any restaurant."
+  },
+  {
+    "id": "d_flat",
+    "code": "SAVE5",
+    "eyebrow": "Orders over $20",
+    "headline": "$5 OFF",
+    "kind": "flat",
+    "value": 500,
+    "minSpendCents": 2000,
+    "art": {
+      "main": "burger"
+    },
+    "terms": "On orders of $20 or more."
+  },
+  {
+    "id": "d_lunch",
+    "code": "LUNCH15",
+    "eyebrow": "Lunch on us",
+    "headline": "15% OFF",
+    "kind": "percent",
+    "value": 15,
+    "minSpendCents": 0,
+    "art": {
+      "main": "ramen"
+    },
+    "terms": "No minimum spend."
+  }
+]

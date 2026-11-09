@@ -1,0 +1,114 @@
+[
+  {
+    "id": "r_stack",
+    "name": "Stack House",
+    "cuisine": "Burgers · American",
+    "rating": 4.8,
+    "minMinutes": 15,
+    "maxMinutes": 20,
+    "distanceKm": 1.2,
+    "deliveryFeeCents": 0,
+    "art": {
+      "main": "fries",
+      "side": "burger"
+    }
+  },
+  {
+    "id": "r_forno",
+    "name": "Forno Nove",
+    "cuisine": "Pizza · Italian",
+    "rating": 4.6,
+    "minMinutes": 20,
+    "maxMinutes": 30,
+    "distanceKm": 2.4,
+    "deliveryFeeCents": 250,
+    "art": {
+      "main": "pizza",
+      "side": "pepper"
+    }
+  },
+  {
+    "id": "r_umami",
+    "name": "Umami Bar",
+    "cuisine": "Sushi · Japanese",
+    "rating": 4.9,
+    "minMinutes": 25,
+    "maxMinutes": 35,
+    "distanceKm": 3.1,
+    "deliveryFeeCents": 199,
+    "art": {
+      "main": "sushi",
+      "side": "avocado"
+    }
+  },
+  {
+    "id": "r_coal",
+    "name": "Coal & Ember",
+    "cuisine": "Grill · Steakhouse",
+    "rating": 4.7,
+    "minMinutes": 30,
+    "maxMinutes": 40,
+    "distanceKm": 3.8,
+    "deliveryFeeCents": 299,
+    "art": {
+      "main": "meat",
+      "side": "mushroom"
+    }
+  },
+  {
+    "id": "r_cluck",
+    "name": "Cluck Yard",
+    "cuisine": "Fried chicken",
+    "rating": 4.5,
+    "minMinutes": 15,
+    "maxMinutes": 25,
+    "distanceKm": 1.6,
+    "deliveryFeeCents": 0,
+    "art": {
+      "main": "chicken",
+      "side": "fries"
+    }
+  },
+  {
+    "id": "r_noodle",
+    "name": "Noodle Lane",
+    "cuisine": "Ramen · Dumplings",
+    "rating": 4.7,
+    "minMinutes": 20,
+    "maxMinutes": 30,
+    "distanceKm": 2.0,
+    "deliveryFeeCents": 150,
+    "art": {
+      "main": "ramen",
+      "side": "dumpling"
+    }
+  },
+  {
+    "id": "r_crumb",
+    "name": "Crumb & Co",
+    "cuisine": "Desserts · Bakery",
+    "rating": 4.8,
+    "minMinutes": 10,
+    "maxMinutes": 20,
+    "distanceKm": 0.9,
+    "deliveryFeeCents": 0,
+    "art": {
+      "main": "dessert",
+      "side": "croissant"
+    }
+  },
+  {
+    "id": "r_sip",
+    "name": "Sip Station",
+    "cuisine": "Coffee · Drinks",
+    "rating": 4.6,
+    "minMinutes": 8,
+    "maxMinutes": 15,
+    "distanceKm": 0.6,
+    "deliveryFeeCents": 0,
+    "art": {
+      "main": "coffee",
+      "side": "bubbletea"
+    }
+  }
+]

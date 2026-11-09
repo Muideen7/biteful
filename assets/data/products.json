@@ -1,0 +1,413 @@
+[
+  {
+    "id": "p_cheeseburger",
+    "name": "Cheese Burger",
+    "priceCents": 599,
+    "calories": 540,
+    "minutes": 15,
+    "categoryId": "burger",
+    "restaurantId": "r_stack",
+    "rating": 4.8,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "Two smashed beef patties, aged cheddar, pickles and house sauce in a toasted brioche bun.",
+    "art": {
+      "main": "burger",
+      "side": "cheese"
+    }
+  },
+  {
+    "id": "p_combo",
+    "name": "Burger & Fries Combo",
+    "priceCents": 899,
+    "calories": 920,
+    "minutes": 15,
+    "categoryId": "burger",
+    "restaurantId": "r_stack",
+    "rating": 4.7,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "Our classic burger with a large portion of skin-on fries. Add a drink at checkout.",
+    "art": {
+      "main": "burger",
+      "side": "fries"
+    }
+  },
+  {
+    "id": "p_pepperoni",
+    "name": "Pepperoni Feast",
+    "priceCents": 1199,
+    "calories": 310,
+    "minutes": 20,
+    "categoryId": "pizza",
+    "restaurantId": "r_forno",
+    "rating": 4.6,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "Wood-fired base, San Marzano tomato, mozzarella and a double layer of spicy pepperoni. Calories per slice.",
+    "art": {
+      "main": "pizza",
+      "side": "pepper"
+    }
+  },
+  {
+    "id": "p_garlicbread",
+    "name": "Cheesy Garlic Bread",
+    "priceCents": 390,
+    "calories": 280,
+    "minutes": 12,
+    "categoryId": "pizza",
+    "restaurantId": "r_forno",
+    "rating": 4.5,
+    "bestSeller": true,
+    "fastDelivery": true,
+    "description": "A warm baguette with roasted garlic butter and melted mozzarella.",
+    "art": {
+      "main": "bread",
+      "side": "garlic"
+    }
+  },
+  {
+    "id": "p_bento",
+    "name": "Sushi Bento Box",
+    "priceCents": 1490,
+    "calories": 610,
+    "minutes": 25,
+    "categoryId": "sushi",
+    "restaurantId": "r_umami",
+    "rating": 4.9,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "Salmon nigiri, tuna maki, tamago, pickled ginger and seasoned rice.",
+    "art": {
+      "main": "bento"
+    }
+  },
+  {
+    "id": "p_maki",
+    "name": "Salmon Avocado Maki",
+    "priceCents": 1390,
+    "calories": 420,
+    "minutes": 20,
+    "categoryId": "sushi",
+    "restaurantId": "r_umami",
+    "rating": 4.8,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "Eight pieces of fresh salmon and ripe avocado rolled in sesame rice.",
+    "art": {
+      "main": "sushi",
+      "side": "avocado"
+    }
+  },
+  {
+    "id": "p_tempura",
+    "name": "Prawn Tempura",
+    "priceCents": 1190,
+    "calories": 380,
+    "minutes": 18,
+    "categoryId": "sushi",
+    "restaurantId": "r_umami",
+    "rating": 4.7,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "Five tiger prawns in a light, crisp batter with tentsuyu dipping sauce.",
+    "art": {
+      "main": "shrimp"
+    }
+  },
+  {
+    "id": "p_friedchicken",
+    "name": "Crispy Fried Chicken",
+    "priceCents": 990,
+    "calories": 640,
+    "minutes": 15,
+    "categoryId": "chicken",
+    "restaurantId": "r_cluck",
+    "rating": 4.6,
+    "bestSeller": true,
+    "fastDelivery": true,
+    "description": "Buttermilk brined, double dredged and fried until it shatters. Three pieces.",
+    "art": {
+      "main": "chicken",
+      "side": "pepper"
+    }
+  },
+  {
+    "id": "p_bucket",
+    "name": "Hot & Spicy Bucket",
+    "priceCents": 1690,
+    "calories": 1240,
+    "minutes": 20,
+    "categoryId": "chicken",
+    "restaurantId": "r_cluck",
+    "rating": 4.5,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "Eight spicy wings, two drumsticks and a share of seasoned fries. Built for two.",
+    "art": {
+      "main": "fries",
+      "side": "chicken"
+    }
+  },
+  {
+    "id": "p_wrap",
+    "name": "Crispy Chicken Wrap",
+    "priceCents": 790,
+    "calories": 520,
+    "minutes": 12,
+    "categoryId": "chicken",
+    "restaurantId": "r_cluck",
+    "rating": 4.4,
+    "bestSeller": true,
+    "fastDelivery": true,
+    "description": "Crispy chicken strips, slaw, pickled onion and chipotle mayo in a warm tortilla.",
+    "art": {
+      "main": "burrito"
+    }
+  },
+  {
+    "id": "p_roastchicken",
+    "name": "Herb Roast Chicken",
+    "priceCents": 1390,
+    "calories": 980,
+    "minutes": 35,
+    "categoryId": "chicken",
+    "restaurantId": "r_coal",
+    "rating": 4.7,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "Half a chicken roasted with thyme, lemon and garlic, served with a crunchy side salad.",
+    "art": {
+      "main": "chicken",
+      "side": "salad"
+    }
+  },
+  {
+    "id": "p_ribeye",
+    "name": "Grilled Ribeye Steak",
+    "priceCents": 2490,
+    "calories": 690,
+    "minutes": 35,
+    "categoryId": "meat",
+    "restaurantId": "r_coal",
+    "rating": 4.9,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "300g ribeye, charred over coals and rested, with garlic butter mushrooms.",
+    "art": {
+      "main": "meat",
+      "side": "mushroom"
+    }
+  },
+  {
+    "id": "p_hotdog",
+    "name": "Classic Hot Dog",
+    "priceCents": 399,
+    "calories": 380,
+    "minutes": 10,
+    "categoryId": "meat",
+    "restaurantId": "r_stack",
+    "rating": 4.4,
+    "bestSeller": true,
+    "fastDelivery": true,
+    "description": "An all-beef frank in a soft bun with mustard, ketchup and crispy onions.",
+    "art": {
+      "main": "hotdog"
+    }
+  },
+  {
+    "id": "p_kebab",
+    "name": "Beef Kebab Skewers",
+    "priceCents": 1090,
+    "calories": 450,
+    "minutes": 20,
+    "categoryId": "meat",
+    "restaurantId": "r_coal",
+    "rating": 4.6,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "Three skewers of spiced beef and peppers, grilled and brushed with chilli oil.",
+    "art": {
+      "main": "oden",
+      "side": "pepper"
+    }
+  },
+  {
+    "id": "p_ramen",
+    "name": "Tonkotsu Ramen",
+    "priceCents": 1250,
+    "calories": 720,
+    "minutes": 20,
+    "categoryId": "noodles",
+    "restaurantId": "r_noodle",
+    "rating": 4.8,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "Rich pork broth simmered for 18 hours, chashu, soft egg and thin noodles.",
+    "art": {
+      "main": "ramen"
+    }
+  },
+  {
+    "id": "p_dumplings",
+    "name": "Pork Dumplings",
+    "priceCents": 850,
+    "calories": 430,
+    "minutes": 15,
+    "categoryId": "noodles",
+    "restaurantId": "r_noodle",
+    "rating": 4.6,
+    "bestSeller": false,
+    "fastDelivery": true,
+    "description": "Eight pan-fried dumplings with crisp bottoms and black vinegar dip.",
+    "art": {
+      "main": "dumpling"
+    }
+  },
+  {
+    "id": "p_carbonara",
+    "name": "Creamy Carbonara",
+    "priceCents": 1150,
+    "calories": 780,
+    "minutes": 20,
+    "categoryId": "pasta",
+    "restaurantId": "r_forno",
+    "rating": 4.5,
+    "bestSeller": true,
+    "fastDelivery": false,
+    "description": "Spaghetti, guanciale, egg yolk and plenty of pecorino. No cream, ever.",
+    "art": {
+      "main": "pasta",
+      "side": "cheese"
+    }
+  },
+  {
+    "id": "p_cake",
+    "name": "Strawberry Shortcake",
+    "priceCents": 650,
+    "calories": 420,
+    "minutes": 10,
+    "categoryId": "dessert",
+    "restaurantId": "r_crumb",
+    "rating": 4.8,
+    "bestSeller": false,
+    "fastDelivery": true,
+    "description": "Light sponge, whipped vanilla cream and fresh strawberries.",
+    "art": {
+      "main": "dessert"
+    }
+  },
+  {
+    "id": "p_donut",
+    "name": "Glazed Doughnut",
+    "priceCents": 290,
+    "calories": 260,
+    "minutes": 8,
+    "categoryId": "dessert",
+    "restaurantId": "r_crumb",
+    "rating": 4.7,
+    "bestSeller": false,
+    "fastDelivery": true,
+    "description": "Brioche doughnut with chocolate glaze and sprinkles.",
+    "art": {
+      "main": "donut"
+    }
+  },
+  {
+    "id": "p_icecream",
+    "name": "Vanilla Soft Serve",
+    "priceCents": 350,
+    "calories": 210,
+    "minutes": 8,
+    "categoryId": "dessert",
+    "restaurantId": "r_crumb",
+    "rating": 4.5,
+    "bestSeller": false,
+    "fastDelivery": false,
+    "description": "Madagascan vanilla soft serve in a crisp waffle cone.",
+    "art": {
+      "main": "icecream"
+    }
+  },
+  {
+    "id": "p_pancakes",
+    "name": "Maple Pancakes",
+    "priceCents": 790,
+    "calories": 560,
+    "minutes": 12,
+    "categoryId": "dessert",
+    "restaurantId": "r_crumb",
+    "rating": 4.6,
+    "bestSeller": false,
+    "fastDelivery": false,
+    "description": "A stack of three fluffy pancakes with butter and maple syrup.",
+    "art": {
+      "main": "pancakes"
+    }
+  },
+  {
+    "id": "p_cola",
+    "name": "Classic Cola",
+    "priceCents": 190,
+    "calories": 140,
+    "minutes": 5,
+    "categoryId": "drinks",
+    "restaurantId": "r_sip",
+    "rating": 4.5,
+    "bestSeller": false,
+    "fastDelivery": true,
+    "description": "Ice cold, 500ml.",
+    "art": {
+      "main": "cola"
+    }
+  },
+  {
+    "id": "p_latte",
+    "name": "Iced Caramel Latte",
+    "priceCents": 490,
+    "calories": 190,
+    "minutes": 8,
+    "categoryId": "drinks",
+    "restaurantId": "r_sip",
+    "rating": 4.7,
+    "bestSeller": false,
+    "fastDelivery": true,
+    "description": "Double espresso, cold milk and salted caramel over ice.",
+    "art": {
+      "main": "coffee"
+    }
+  },
+  {
+    "id": "p_boba",
+    "name": "Brown Sugar Boba",
+    "priceCents": 550,
+    "calories": 320,
+    "minutes": 10,
+    "categoryId": "drinks",
+    "restaurantId": "r_sip",
+    "rating": 4.8,
+    "bestSeller": false,
+    "fastDelivery": true,
+    "description": "Fresh milk tea with slow-cooked brown sugar pearls.",
+    "art": {
+      "main": "bubbletea"
+    }
+  },
+  {
+    "id": "p_smoothie",
+    "name": "Mango Sunrise",
+    "priceCents": 590,
+    "calories": 240,
+    "minutes": 8,
+    "categoryId": "drinks",
+    "restaurantId": "r_sip",
+    "rating": 4.6,
+    "bestSeller": false,
+    "fastDelivery": false,
+    "description": "Mango, passion fruit and orange, blended to order.",
+    "art": {
+      "main": "smoothie"
+    }
+  }
+]

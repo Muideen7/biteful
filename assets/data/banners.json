@@ -1,0 +1,37 @@
+[
+  {
+    "id": "b_free",
+    "style": "rider",
+    "lineOne": "FAST & FREE",
+    "lineTwo": "DELIVERY!",
+    "subtitle": "On all orders this week",
+    "cta": "Order now",
+    "dealId": "d_ship"
+  },
+  {
+    "id": "b_treat",
+    "style": "art",
+    "lineOne": "30% OFF",
+    "lineTwo": "YOUR ORDER",
+    "subtitle": "Use code TREAT30 at checkout",
+    "cta": "Apply",
+    "dealId": "d_whole",
+    "art": {
+      "main": "pizza",
+      "side": "pepper"
+    }
+  },
+  {
+    "id": "b_umami",
+    "style": "art",
+    "lineOne": "NEW ON {app}",
+    "lineTwo": "UMAMI BAR",
+    "subtitle": "Fresh sushi, 25 min away",
+    "cta": "Explore",
+    "restaurantId": "r_umami",
+    "art": {
+      "main": "sushi",
+      "side": "avocado"
+    }
+  }
+]
