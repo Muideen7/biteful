@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../config/app_theme.dart';
 import '../../config/design_tokens.dart';
 import '../../widgets/overscroll_fill.dart';
-import '../auth/auth_header.dart';
+import 'brand_header_hero.dart';
 
 /// The frame for Saved, Cart, Offers and Profile: a short green header with
 /// the title, in the same shape as Home's, then the page's slivers.
@@ -57,51 +57,56 @@ class _TabPageState extends State<TabPage> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             slivers: [
               SliverToBoxAdapter(
-                child: BrandHeaderShape(
+                // The background is the shared header Hero; the title sits
+                // on top and is not part of the flight.
+                child: Stack(
                   key: _header,
-                  radius: Radii.header * .75,
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        Space.gutter, top + Space.md, Space.gutter, Space.xl),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            if (canPop) ...[
-                              IconButton.filled(
-                                tooltip: 'Back',
-                                onPressed: () =>
-                                    Navigator.of(context).maybePop(),
-                                style: IconButton.styleFrom(
-                                  backgroundColor:
-                                      p.card.withValues(alpha: .18),
-                                  foregroundColor: p.card,
+                  children: [
+                    const Positioned.fill(
+                        child: BrandHeaderHero(radius: Radii.header * .75)),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          Space.gutter, top + Space.md, Space.gutter, Space.xl),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              if (canPop) ...[
+                                IconButton.filled(
+                                  tooltip: 'Back',
+                                  onPressed: () =>
+                                      Navigator.of(context).maybePop(),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor:
+                                        p.card.withValues(alpha: .18),
+                                    foregroundColor: p.card,
+                                  ),
+                                  icon: const Icon(Icons.arrow_back_rounded),
                                 ),
-                                icon: const Icon(Icons.arrow_back_rounded),
+                                const SizedBox(width: Space.sm),
+                              ],
+                              Expanded(
+                                child: Text(widget.title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: context.display
+                                        .copyWith(color: p.card)),
                               ),
-                              const SizedBox(width: Space.sm),
+                              if (widget.trailing != null) widget.trailing!,
                             ],
-                            Expanded(
-                              child: Text(widget.title,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style:
-                                      context.display.copyWith(color: p.card)),
-                            ),
-                            if (widget.trailing != null) widget.trailing!,
+                          ),
+                          if (widget.subtitle != null) ...[
+                            const SizedBox(height: 4),
+                            Text(widget.subtitle!,
+                                style: TextStyle(
+                                    color: p.card.withValues(alpha: .85),
+                                    fontWeight: FontWeight.w500)),
                           ],
-                        ),
-                        if (widget.subtitle != null) ...[
-                          const SizedBox(height: 4),
-                          Text(widget.subtitle!,
-                              style: TextStyle(
-                                  color: p.card.withValues(alpha: .85),
-                                  fontWeight: FontWeight.w500)),
                         ],
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
               ...widget.slivers,
