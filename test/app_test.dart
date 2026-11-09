@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:dishly/app.dart';
+import 'package:dishly/config/app_brand.dart';
 import 'package:dishly/config/app_timing.dart';
 import 'package:dishly/screens/auth/sign_in_screen.dart';
 import 'package:dishly/screens/shell/main_shell.dart';
 import 'package:dishly/screens/splash/splash_overlay.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -44,6 +46,18 @@ void main() {
     await pumpPastSplash(t);
     expect(find.byType(SplashOverlay), findsNothing);
     expect(find.byType(SignInScreen), findsOneWidget);
+  });
+
+  testWidgets('splash text has a real text style, not the unstyled fallback', (t) async {
+    await launch(t);
+    await t.pump(AppTiming.splashDriveIn + const Duration(milliseconds: 300));
+    final tagline = find.text(AppBrand.tagline);
+    expect(tagline, findsOneWidget);
+    // Without a Material above it, text inherits the debug fallback style:
+    // a yellow double underline.
+    final style = DefaultTextStyle.of(t.element(tagline)).style;
+    expect(style.decoration, isNot(TextDecoration.underline));
+    await pumpPastSplash(t);
   });
 
   testWidgets('a remembered session goes straight to Home after the splash',
