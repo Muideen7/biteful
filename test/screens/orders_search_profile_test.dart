@@ -165,7 +165,7 @@ void main() {
       await t.pumpAndSettle();
       await t.tap(find.text('Save changes'));
       await t.pumpAndSettle();
-      expect(c.read(sessionProvider)!.phone, '+1 810 555 0199');
+      expect(c.read(profileProvider).value!.phone, '+1 810 555 0199');
       expect(find.text('Olympicson A.'), findsOneWidget);
     });
 

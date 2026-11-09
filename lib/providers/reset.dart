@@ -15,6 +15,7 @@ Future<void> resetDemoData(WidgetRef ref) async {
   await ref.read(storeProvider).reset();
   for (final p in <ProviderOrFamily>[
     sessionProvider,
+    profileProvider,
     cartProvider,
     savedProvider,
     appliedDealProvider,

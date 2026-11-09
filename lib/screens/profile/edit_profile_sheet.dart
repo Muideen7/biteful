@@ -66,9 +66,7 @@ class _EditProfileState extends ConsumerState<_EditProfile> {
     final nav = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final palette = context.palette;
-    await ref
-        .read(sessionProvider.notifier)
-        .updateProfile(widget.profile.copyWith(
+    await ref.read(profileProvider.notifier).save(widget.profile.copyWith(
           name: _name.text.trim(),
           email: _email.text.trim().toLowerCase(),
           phone: _phone.text.trim(),

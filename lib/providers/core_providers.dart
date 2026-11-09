@@ -56,7 +56,10 @@ final authRepositoryProvider = FutureProvider<AuthRepository>(
 );
 
 final accountRepositoryProvider = FutureProvider<AccountRepository>(
-  (ref) async => LocalAccountRepository(await ref.watch(seedProvider.future)),
+  (ref) async => LocalAccountRepository(
+    await ref.watch(seedProvider.future),
+    ref.watch(storeProvider),
+  ),
 );
 
 final orderRepositoryProvider = FutureProvider<OrderRepository>(

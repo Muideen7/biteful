@@ -79,7 +79,8 @@ void main() {
     await t.tap(find.text('Log In'));
     await t.pumpAndSettle();
     expect(find.byType(MainShell), findsOneWidget);
-    expect(c.read(sessionProvider)!.name, seed.profile.name);
+    expect(c.read(sessionProvider), seed.profile.email);
+    expect(c.read(profileProvider).value!.name, seed.profile.name);
   });
 
   testWidgets('sign up grows a name field and needs the terms', (t) async {

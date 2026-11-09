@@ -7,6 +7,7 @@ import 'package:dishly/models/account.dart';
 import 'package:dishly/providers/account_providers.dart';
 import 'package:dishly/providers/core_providers.dart';
 import 'package:dishly/providers/order_providers.dart';
+import 'package:dishly/providers/session_providers.dart';
 import 'package:dishly/services/seed.dart';
 import 'package:dishly/services/store.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,8 @@ Future<(ProviderContainer, Store)> makeContainer(
     ...prefs,
   });
   final store = Store(await SharedPreferences.getInstance());
-  if (signedIn != null) await store.setJson(Store.session, signedIn.toJson());
+  if (signedIn != null)
+    await store.setJson(Store.session, {'email': signedIn.email});
   final container = ProviderContainer(overrides: [
     storeProvider.overrideWithValue(store),
     clockProvider.overrideWithValue(() => clock),
@@ -75,6 +77,7 @@ Future<void> pumpScreen(
   await container.read(orderHistoryProvider.future);
   await container.read(notificationFeedProvider.future);
   await container.read(addressesProvider.future);
+  await container.read(profileProvider.future);
   await tester.pumpWidget(UncontrolledProviderScope(
     container: container,
     child: MaterialApp(

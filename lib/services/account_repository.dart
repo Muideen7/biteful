@@ -1,5 +1,6 @@
 import '../models/account.dart';
 import 'seed.dart';
+import 'store.dart';
 
 /// The signed-in person's side of the app: their profile, saved addresses
 /// and notifications. Async throughout, so a backend drops in without
@@ -15,18 +16,26 @@ abstract interface class AccountRepository {
   Future<List<AppNotification>> notifications();
 }
 
-/// Reads the bundled seed. Edits are kept by the providers in local storage
-/// (see `account_providers.dart`), so this only has to hand them back.
+/// The account on this device: the seed's person until they edit their
+/// details, then their own saved copy. Address edits are kept by
+/// `AddressesNotifier`, so those methods only hand them back.
 class LocalAccountRepository implements AccountRepository {
-  LocalAccountRepository(this._seed);
+  LocalAccountRepository(this._seed, this._store);
 
   final Seed _seed;
+  final Store _store;
 
   @override
-  Future<UserProfile> profile() async => _seed.profile;
+  Future<UserProfile> profile() async {
+    final saved = _store.json<Map<String, dynamic>>(Store.profile);
+    return saved == null ? _seed.profile : UserProfile.fromJson(saved);
+  }
 
   @override
-  Future<UserProfile> updateProfile(UserProfile profile) async => profile;
+  Future<UserProfile> updateProfile(UserProfile profile) async {
+    await _store.setJson(Store.profile, profile.toJson());
+    return profile;
+  }
 
   @override
   Future<List<Address>> addresses() async => _seed.addresses;

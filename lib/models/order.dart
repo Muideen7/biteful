@@ -163,13 +163,6 @@ class RecentDish {
   }
 }
 
-/// Unique even when two are made in the same millisecond.
-abstract final class Ids {
-  static int _counter = 0;
-  static String next(String prefix) =>
-      '${prefix}_${DateTime.now().millisecondsSinceEpoch}_${_counter++}';
-}
-
 /// Why a deal does not apply to the current basket, if it does not.
 sealed class DealCheck {
   const DealCheck();

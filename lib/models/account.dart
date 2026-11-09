@@ -10,21 +10,20 @@ class UserProfile {
   final String email;
   final String phone;
 
-  /// `asset:people/x.png`, a reference to a bundled file. Never image bytes.
+  /// A media reference: `asset:people/x.png` for a bundled picture,
+  /// `file:media/x.jpg` for one the person chose, or empty for none (the
+  /// initial shows instead). Never image bytes.
   final String avatar;
 
   String get firstName => name.trim().split(RegExp(r'\s+')).first;
 
-  String? get avatarAsset => avatar.startsWith('asset:')
-      ? 'assets/images/${avatar.substring(6)}'
-      : null;
-
-  UserProfile copyWith({String? name, String? email, String? phone}) =>
+  UserProfile copyWith(
+          {String? name, String? email, String? phone, String? avatar}) =>
       UserProfile(
         name: name ?? this.name,
         email: email ?? this.email,
         phone: phone ?? this.phone,
-        avatar: avatar,
+        avatar: avatar ?? this.avatar,
       );
 
   factory UserProfile.fromJson(Map<String, dynamic> j) => UserProfile(

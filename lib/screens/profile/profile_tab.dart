@@ -45,7 +45,7 @@ class ProfileTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final p = context.palette;
-    final profile = ref.watch(sessionProvider);
+    final profile = ref.watch(profileProvider).valueOrNull;
     final address = ref.watch(currentAddressProvider);
     final mode = ref.watch(themeModeProvider);
     final orders = ref.watch(ordersProvider);
