@@ -1,0 +1,48 @@
+import { ImageSourcePropType } from 'react-native';
+
+const foodImages: Record<string, ImageSourcePropType> = {
+  avocado: require('@/assets/images/food/avocado.png'),
+  bento: require('@/assets/images/food/bento.png'),
+  bread: require('@/assets/images/food/bread.png'),
+  bubbletea: require('@/assets/images/food/bubbletea.png'),
+  burger: require('@/assets/images/food/burger.png'),
+  burrito: require('@/assets/images/food/burrito.png'),
+  cheese: require('@/assets/images/food/cheese.png'),
+  chicken: require('@/assets/images/food/chicken.png'),
+  chopsticks: require('@/assets/images/food/chopsticks.png'),
+  coffee: require('@/assets/images/food/coffee.png'),
+  cola: require('@/assets/images/food/cola.png'),
+  croissant: require('@/assets/images/food/croissant.png'),
+  curry: require('@/assets/images/food/curry.png'),
+  dessert: require('@/assets/images/food/dessert.png'),
+  donut: require('@/assets/images/food/donut.png'),
+  dumpling: require('@/assets/images/food/dumpling.png'),
+  flatbread: require('@/assets/images/food/flatbread.png'),
+  fries: require('@/assets/images/food/fries.png'),
+  garlic: require('@/assets/images/food/garlic.png'),
+  hotdog: require('@/assets/images/food/hotdog.png'),
+  icecream: require('@/assets/images/food/icecream.png'),
+  juice: require('@/assets/images/food/juice.png'),
+  meat: require('@/assets/images/food/meat.png'),
+  mushroom: require('@/assets/images/food/mushroom.png'),
+  oden: require('@/assets/images/food/oden.png'),
+  paella: require('@/assets/images/food/paella.png'),
+  pancakes: require('@/assets/images/food/pancakes.png'),
+  pasta: require('@/assets/images/food/pasta.png'),
+  pepper: require('@/assets/images/food/pepper.png'),
+  pizza: require('@/assets/images/food/pizza.png'),
+  ramen: require('@/assets/images/food/ramen.png'),
+  ricecracker: require('@/assets/images/food/ricecracker.png'),
+  rice: require('@/assets/images/food/rice.png'),
+  salad: require('@/assets/images/food/salad.png'),
+  sandwich: require('@/assets/images/food/sandwich.png'),
+  shrimp: require('@/assets/images/food/shrimp.png'),
+  smoothie: require('@/assets/images/food/smoothie.png'),
+  sushi: require('@/assets/images/food/sushi.png'),
+  taco: require('@/assets/images/food/taco.png'),
+  takeout: require('@/assets/images/food/takeout.png'),
+};
+
+export function getFoodImage(name: string): ImageSourcePropType {
+  return foodImages[name] || foodImages['burger'];
+}

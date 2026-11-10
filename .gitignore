@@ -1,6 +1,11 @@
-# Miscellaneous
-*.class
-*.log
+# Legacy Flutter archive
+_flutter_legacy/
+
+# Expo / React Native
+.expo/
+dist/
+web-build/
+node_modules/
 *.pyc
 *.swp
 .DS_Store

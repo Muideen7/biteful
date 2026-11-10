@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Biteful",
+    "slug": "biteful",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/brand/icon.png",
+    "scheme": "biteful",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#FBF9F6"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/brand/adaptive-icon.png",
+        "backgroundColor": "#FF5A36"
+      }
+    },
+    "web": {
+      "favicon": "./assets/brand/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Bricolage-Regular.ttf",
+            "./assets/fonts/Bricolage-Medium.ttf",
+            "./assets/fonts/Bricolage-SemiBold.ttf",
+            "./assets/fonts/Bricolage-Bold.ttf",
+            "./assets/fonts/Bricolage-ExtraBold.ttf"
+          ]
+        }
+      ]
+    ]
+  }
+}
