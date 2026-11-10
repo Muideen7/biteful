@@ -2,6 +2,7 @@
   "name": "biteful",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "author": "Muideen7 <olayeyeayomide2000@gmail.com>",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
