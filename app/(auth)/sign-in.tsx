@@ -9,24 +9,21 @@ import {
   Platform,
   Alert,
   Modal,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
-  ArrowRight,
   EnvelopeSimple,
   Lock,
-  User,
   Eye,
   EyeSlash,
-  Motorcycle,
-  AppleLogo,
   Check,
   X,
+  AppleLogo,
 } from 'phosphor-react-native';
 import Svg, { Path } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
-import { Wordmark } from '@/components/common/Wordmark';
 import { useSessionStore } from '@/stores/useSessionStore';
 
 function GoogleIcon({ size = 20 }: { size?: number }) {
@@ -55,38 +52,23 @@ function GoogleIcon({ size = 20 }: { size?: number }) {
 export default function SignInScreen() {
   const router = useRouter();
   const setProfile = useSessionStore((s) => s.setProfile);
-  const isDarkMode = useSessionStore((s) => s.isDarkMode);
 
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
-  const [agreeTerms, setAgreeTerms] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
 
-  const handleEmailAuth = () => {
+  const handleSignIn = () => {
     if (!email || !password) {
-      Alert.alert('Missing Fields', 'Please fill in your email and password.');
-      return;
-    }
-    if (isSignUp && !agreeTerms) {
-      Alert.alert(
-        'Terms of Service',
-        'Please agree to the Terms of Service to create an account.'
-      );
+      Alert.alert('Missing Fields', 'Please fill in your email or phone and password.');
       return;
     }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    if (isSignUp && name.trim()) {
+    if (email.trim()) {
       setProfile({
-        name: name.trim(),
-        email: email.trim(),
-      });
-    } else if (email.trim()) {
-      setProfile({
+        name: 'FrontendGeek',
         email: email.trim(),
       });
     }
@@ -119,17 +101,73 @@ export default function SignInScreen() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setShowForgotModal(false);
     Alert.alert(
-      'Reset Link Sent',
+      'Reset Link Dispatched',
       `A password reset link has been dispatched to ${forgotEmail}. Check your inbox!`
     );
     setForgotEmail('');
   };
 
   return (
-    <SafeAreaView
-      edges={['top', 'bottom']}
-      className="flex-1 bg-paper-light dark:bg-paper-dark"
-    >
+    <View className="flex-1 bg-paper-light dark:bg-paper-dark">
+      {/* Curved Tangerine Brand Header */}
+      <View
+        className="bg-brand-primary pt-12 pb-6 px-6 relative overflow-hidden"
+        style={{
+          borderBottomLeftRadius: 36,
+          borderBottomRightRadius: 36,
+        }}
+      >
+        {/* Soft radial backdrop ring */}
+        <View className="w-48 h-48 rounded-full bg-white/10 absolute -right-8 -bottom-10" />
+
+        {/* Top utility row: App Tour & Skip */}
+        <View className="flex-row justify-between items-center mb-4 z-10">
+          <TouchableOpacity
+            onPress={() => router.push('/onboarding')}
+            className="px-3 py-1.5 rounded-full bg-white/20 border border-white/30"
+          >
+            <Text className="text-xs font-bold text-white tracking-wide">
+              App Tour
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.replace('/(tabs)/')}
+            className="px-3 py-1.5 rounded-full bg-white/20 border border-white/30"
+          >
+            <Text className="text-xs font-bold text-white/90 tracking-wide">
+              Skip
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Header content: Wordmark + Tagline on Left, Dispatch Rider on Right */}
+        <View className="flex-row items-center justify-between z-10 min-h-[110px]">
+          <View className="flex-1 pr-3">
+            <View className="flex-row items-baseline">
+              <Text className="text-3xl font-black text-white tracking-tight">
+                Biteful
+              </Text>
+              <Text className="text-3xl font-black text-brand-honey tracking-tight">
+                .
+              </Text>
+            </View>
+            <Text className="text-white/90 text-sm font-semibold mt-1 leading-snug">
+              Hot meals,{'\n'}right at your door.
+            </Text>
+          </View>
+
+          {/* Rider Illustration */}
+          <View className="w-32 h-28 items-center justify-center">
+            <Image
+              source={require('@/assets/brand/rider_onboarding.png')}
+              style={{ width: 125, height: 110 }}
+              resizeMode="contain"
+            />
+          </View>
+        </View>
+      </View>
+
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
@@ -137,286 +175,140 @@ export default function SignInScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            padding: 20,
-            flexGrow: 1,
+            paddingHorizontal: 24,
+            paddingTop: 28,
+            paddingBottom: 40,
             maxWidth: 480,
             width: '100%',
             alignSelf: 'center',
           }}
         >
-          {/* Top Actions: Tour & Skip */}
-          <View className="flex-row justify-between items-center mb-4">
-            <TouchableOpacity
-              onPress={() => router.push('/onboarding')}
-              className="px-3.5 py-1.5 rounded-full bg-card-light dark:bg-card-dark border border-line-light dark:border-line-dark shadow-xs"
-            >
-              <Text className="text-xs font-bold text-brand-primary">
-                App Tour
-              </Text>
-            </TouchableOpacity>
+          {/* Welcome Back Heading */}
+          <Text className="text-2xl font-black text-ink dark:text-ink-darkDefault mb-6">
+            Welcome Back
+          </Text>
 
+          {/* Email or Phone Input Pill */}
+          <View className="w-full h-14 bg-[#F2EDE8] dark:bg-[#231F1C] rounded-full px-5 flex-row items-center border border-line-light dark:border-line-dark mb-4 shadow-2xs">
+            <EnvelopeSimple size={20} weight="regular" color="#8A8179" />
+            <TextInput
+              placeholder="Email or phone"
+              placeholderTextColor="#8A8179"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              className="flex-1 ml-3 text-base text-ink dark:text-ink-darkDefault font-medium"
+            />
+          </View>
+
+          {/* Password Input Pill */}
+          <View className="w-full h-14 bg-[#F2EDE8] dark:bg-[#231F1C] rounded-full px-5 flex-row items-center border border-line-light dark:border-line-dark mb-4 shadow-2xs">
+            <Lock size={20} weight="regular" color="#8A8179" />
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor="#8A8179"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              className="flex-1 ml-3 text-base text-ink dark:text-ink-darkDefault font-medium"
+            />
             <TouchableOpacity
-              onPress={() => router.replace('/(tabs)/')}
-              className="px-3.5 py-1.5 rounded-full bg-card-light dark:bg-card-dark border border-line-light dark:border-line-dark shadow-xs"
+              onPress={() => setShowPassword(!showPassword)}
+              className="p-1.5"
             >
-              <Text className="text-xs font-bold text-ink-muted">Skip</Text>
+              {showPassword ? (
+                <Eye size={20} color="#8A8179" />
+              ) : (
+                <EyeSlash size={20} color="#8A8179" />
+              )}
             </TouchableOpacity>
           </View>
 
-          {/* Hero Header Card */}
-          <View className="bg-brand-primary rounded-3xl p-6 mb-5 relative overflow-hidden shadow-sm items-center">
-            <View className="w-16 h-16 rounded-full bg-white/20 items-center justify-center mb-3">
-              <Motorcycle size={38} weight="duotone" color="#FFFFFF" />
-            </View>
-            <Wordmark size="lg" />
-            <Text className="text-white/85 text-sm font-semibold mt-1">
-              Hot meals, craved and delivered fast.
-            </Text>
-          </View>
-
-          {/* Auth Card */}
-          <View className="bg-card-light dark:bg-card-dark rounded-3xl p-6 border border-line-light dark:border-line-dark shadow-xs mb-6">
-            {/* Mode Switch Tabs */}
-            <View className="flex-row bg-paper-light dark:bg-paper-dark p-1 rounded-2xl mb-5 border border-line-light dark:border-line-dark">
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => setIsSignUp(false)}
-                className={`flex-1 py-2.5 rounded-xl items-center justify-center ${
-                  !isSignUp
-                    ? 'bg-card-light dark:bg-card-dark shadow-xs'
-                    : 'bg-transparent'
-                }`}
-              >
-                <Text
-                  className={`text-sm font-bold ${
-                    !isSignUp
-                      ? 'text-brand-primary'
-                      : 'text-ink-muted dark:text-ink-darkMuted'
-                  }`}
-                >
-                  Sign In
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => setIsSignUp(true)}
-                className={`flex-1 py-2.5 rounded-xl items-center justify-center ${
-                  isSignUp
-                    ? 'bg-card-light dark:bg-card-dark shadow-xs'
-                    : 'bg-transparent'
-                }`}
-              >
-                <Text
-                  className={`text-sm font-bold ${
-                    isSignUp
-                      ? 'text-brand-primary'
-                      : 'text-ink-muted dark:text-ink-darkMuted'
-                  }`}
-                >
-                  Sign Up
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <Text className="text-2xl font-black text-ink dark:text-ink-darkDefault mb-1">
-              {isSignUp ? 'Create an Account' : 'Welcome Back'}
-            </Text>
-            <Text className="text-sm text-ink-muted mb-5">
-              {isSignUp
-                ? 'Sign up to track live orders and save favorite dishes'
-                : 'Enter your credentials to continue ordering'}
-            </Text>
-
-            {/* Social Auth Buttons (Gmail & Apple) */}
-            <View className="mb-5">
-              {/* Google Button */}
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={handleGoogleAuth}
-                className="w-full bg-paper-light dark:bg-paper-dark border border-line-light dark:border-line-dark py-3.5 px-4 rounded-2xl flex-row items-center justify-center mb-3 shadow-xs"
-              >
-                <GoogleIcon size={20} />
-                <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault ml-2.5">
-                  Continue with Google
-                </Text>
-              </TouchableOpacity>
-
-              {/* Apple Button */}
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={handleAppleAuth}
-                className="w-full bg-[#181512] dark:bg-white py-3.5 px-4 rounded-2xl flex-row items-center justify-center shadow-xs"
-              >
-                <AppleLogo
-                  size={20}
-                  weight="fill"
-                  color={isDarkMode ? '#181512' : '#FFFFFF'}
-                />
-                <Text
-                  className={`text-sm font-bold ml-2.5 ${
-                    isDarkMode ? 'text-[#181512]' : 'text-white'
-                  }`}
-                >
-                  Continue with Apple
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Or Divider */}
-            <View className="flex-row items-center mb-5">
-              <View className="flex-1 h-px bg-line-light dark:bg-line-dark" />
-              <Text className="text-xs font-bold text-ink-muted uppercase tracking-wider px-3">
-                or with email
-              </Text>
-              <View className="flex-1 h-px bg-line-light dark:bg-line-dark" />
-            </View>
-
-            {/* Full Name Field (Sign Up Only) */}
-            {isSignUp && (
-              <View className="mb-4">
-                <Text className="text-xs font-bold uppercase tracking-wider text-ink-muted mb-1.5">
-                  Full Name
-                </Text>
-                <View className="flex-row items-center bg-paper-light dark:bg-paper-dark rounded-xl px-3.5 py-3 border border-line-light dark:border-line-dark">
-                  <User size={18} color="#8A8179" />
-                  <TextInput
-                    placeholder="Frontend Geek"
-                    placeholderTextColor="#8A8179"
-                    value={name}
-                    onChangeText={setName}
-                    className="flex-1 ml-2.5 text-base text-ink dark:text-ink-darkDefault font-medium"
-                  />
-                </View>
-              </View>
-            )}
-
-            {/* Email Field */}
-            <Text className="text-xs font-bold uppercase tracking-wider text-ink-muted mb-1.5">
-              Email Address
-            </Text>
-            <View className="flex-row items-center bg-paper-light dark:bg-paper-dark rounded-xl px-3.5 py-3 border border-line-light dark:border-line-dark mb-4">
-              <EnvelopeSimple size={18} color="#8A8179" />
-              <TextInput
-                placeholder="name@example.com"
-                placeholderTextColor="#8A8179"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
-                className="flex-1 ml-2.5 text-base text-ink dark:text-ink-darkDefault font-medium"
-              />
-            </View>
-
-            {/* Password Field */}
-            <Text className="text-xs font-bold uppercase tracking-wider text-ink-muted mb-1.5">
-              Password
-            </Text>
-            <View className="flex-row items-center bg-paper-light dark:bg-paper-dark rounded-xl px-3.5 py-3 border border-line-light dark:border-line-dark mb-4">
-              <Lock size={18} color="#8A8179" />
-              <TextInput
-                placeholder="••••••••"
-                placeholderTextColor="#8A8179"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
-                className="flex-1 ml-2.5 text-base text-ink dark:text-ink-darkDefault font-medium"
-              />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                hitSlop={8}
-                className="p-1"
-              >
-                {showPassword ? (
-                  <EyeSlash size={18} color="#8A8179" />
-                ) : (
-                  <Eye size={18} color="#8A8179" />
-                )}
-              </TouchableOpacity>
-            </View>
-
-            {/* Options Row */}
-            {!isSignUp ? (
-              <View className="flex-row items-center justify-between mb-5">
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={() => setKeepSignedIn(!keepSignedIn)}
-                  className="flex-row items-center"
-                >
-                  <View
-                    className={`w-5 h-5 rounded-md border items-center justify-center mr-2 ${
-                      keepSignedIn
-                        ? 'bg-brand-primary border-brand-primary'
-                        : 'border-line-light dark:border-line-dark bg-paper-light dark:bg-paper-dark'
-                    }`}
-                  >
-                    {keepSignedIn && (
-                      <Check size={12} weight="bold" color="#FFFFFF" />
-                    )}
-                  </View>
-                  <Text className="text-xs font-semibold text-ink-muted">
-                    Keep me signed in
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={() => setShowForgotModal(true)}
-                >
-                  <Text className="text-xs font-bold text-brand-primary">
-                    Forgot Password?
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => setAgreeTerms(!agreeTerms)}
-                className="flex-row items-center mb-5"
-              >
-                <View
-                  className={`w-5 h-5 rounded-md border items-center justify-center mr-2.5 ${
-                    agreeTerms
-                      ? 'bg-brand-primary border-brand-primary'
-                      : 'border-line-light dark:border-line-dark bg-paper-light dark:bg-paper-dark'
-                  }`}
-                >
-                  {agreeTerms && (
-                    <Check size={12} weight="bold" color="#FFFFFF" />
-                  )}
-                </View>
-                <Text className="text-xs font-medium text-ink-muted flex-1">
-                  I agree to the{' '}
-                  <Text className="text-brand-primary font-bold">Terms of Service</Text>{' '}
-                  and Privacy Policy.
-                </Text>
-              </TouchableOpacity>
-            )}
-
-            {/* Submit Button */}
+          {/* Keep me signed in & Forgot Password Row */}
+          <View className="flex-row items-center justify-between mb-6 px-1">
             <TouchableOpacity
-              activeOpacity={0.88}
-              onPress={handleEmailAuth}
-              className="bg-brand-primary py-4 rounded-full flex-row items-center justify-center shadow-md mb-4"
+              activeOpacity={0.8}
+              onPress={() => setKeepSignedIn(!keepSignedIn)}
+              className="flex-row items-center"
             >
-              <Text className="text-white font-extrabold text-base mr-2">
-                {isSignUp ? 'Create Account' : 'Sign In'}
+              <View
+                className={`w-5 h-5 rounded-md items-center justify-center mr-2 border ${
+                  keepSignedIn
+                    ? 'bg-brand-primary border-brand-primary'
+                    : 'bg-white dark:bg-[#231F1C] border-line-light dark:border-line-dark'
+                }`}
+              >
+                {keepSignedIn && <Check size={13} weight="bold" color="#FFFFFF" />}
+              </View>
+              <Text className="text-sm font-semibold text-ink-muted dark:text-ink-darkMuted">
+                Keep me signed in
               </Text>
-              <ArrowRight size={18} weight="bold" color="#FFFFFF" />
             </TouchableOpacity>
 
-            {/* Mode Switch Toggle Footer */}
             <TouchableOpacity
-              onPress={() => setIsSignUp(!isSignUp)}
-              className="items-center py-2"
+              onPress={() => setShowForgotModal(true)}
+              hitSlop={8}
             >
-              <Text className="text-sm font-semibold text-ink-muted">
-                {isSignUp
-                  ? 'Already have an account? '
-                  : "Don't have an account? "}
-                <Text className="text-brand-primary font-bold">
-                  {isSignUp ? 'Sign In' : 'Sign Up'}
-                </Text>
+              <Text className="text-sm font-bold text-brand-primary">
+                Forgot Password?
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Log In Pill Button */}
+          <TouchableOpacity
+            activeOpacity={0.88}
+            onPress={handleSignIn}
+            className="w-full h-14 rounded-full bg-brand-primary items-center justify-center shadow-sm mb-6"
+          >
+            <Text className="text-base font-extrabold text-white tracking-wide">
+              Log In
+            </Text>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View className="flex-row items-center my-2">
+            <View className="flex-1 h-px bg-line-light dark:bg-line-dark" />
+            <Text className="mx-4 text-xs font-bold text-ink-muted uppercase tracking-wider">
+              Or continue with
+            </Text>
+            <View className="flex-1 h-px bg-line-light dark:bg-line-dark" />
+          </View>
+
+          {/* Side-by-Side Social Buttons */}
+          <View className="flex-row items-center gap-3 mt-4 mb-8">
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={handleGoogleAuth}
+              className="flex-1 h-13 rounded-full bg-card-light dark:bg-card-dark border border-line-light dark:border-line-dark flex-row items-center justify-center shadow-xs"
+            >
+              <GoogleIcon size={20} />
+              <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault ml-2">
+                Google
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={handleAppleAuth}
+              className="flex-1 h-13 rounded-full bg-card-light dark:bg-card-dark border border-line-light dark:border-line-dark flex-row items-center justify-center shadow-xs"
+            >
+              <AppleLogo size={20} weight="fill" color="#181512" />
+              <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault ml-2">
+                Apple
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Bottom Switch Link */}
+          <View className="flex-row items-center justify-center">
+            <Text className="text-sm font-medium text-ink-muted dark:text-ink-darkMuted">
+              Don't have an account?{' '}
+            </Text>
+            <TouchableOpacity onPress={() => router.push('/(auth)/sign-up')}>
+              <Text className="text-sm font-bold text-brand-primary">
+                Sign Up
               </Text>
             </TouchableOpacity>
           </View>
@@ -430,49 +322,48 @@ export default function SignInScreen() {
         animationType="fade"
         onRequestClose={() => setShowForgotModal(false)}
       >
-        <View className="flex-1 bg-black/50 justify-center items-center px-5">
-          <View className="bg-card-light dark:bg-card-dark w-full max-w-sm rounded-3xl p-6 border border-line-light dark:border-line-dark shadow-lg">
-            <View className="flex-row items-center justify-between mb-3">
-              <Text className="text-xl font-black text-ink dark:text-ink-darkDefault">
+        <View className="flex-1 bg-black/60 items-center justify-center p-5">
+          <View className="bg-card-light dark:bg-card-dark rounded-3xl p-6 w-full max-w-sm border border-line-light dark:border-line-dark shadow-lg">
+            <View className="flex-row justify-between items-center mb-3">
+              <Text className="text-lg font-black text-ink dark:text-ink-darkDefault">
                 Reset Password
               </Text>
               <TouchableOpacity
                 onPress={() => setShowForgotModal(false)}
-                className="p-1 rounded-full bg-paper-light dark:bg-paper-dark"
+                className="w-8 h-8 rounded-full bg-paper-light dark:bg-paper-dark items-center justify-center"
               >
-                <X size={18} color="#8A8179" />
+                <X size={16} color="#8A8179" />
               </TouchableOpacity>
             </View>
 
-            <Text className="text-xs text-ink-muted mb-4 leading-4">
-              Enter your registered email address and we will dispatch a reset link to your inbox.
+            <Text className="text-sm text-ink-muted mb-4">
+              Enter your email address and we will dispatch password recovery instructions.
             </Text>
 
-            <View className="flex-row items-center bg-paper-light dark:bg-paper-dark rounded-xl px-3.5 py-3 border border-line-light dark:border-line-dark mb-4">
+            <View className="w-full h-12 bg-[#F2EDE8] dark:bg-[#231F1C] rounded-full px-4 flex-row items-center border border-line-light dark:border-line-dark mb-4">
               <EnvelopeSimple size={18} color="#8A8179" />
               <TextInput
-                placeholder="name@example.com"
+                placeholder="you@email.com"
                 placeholderTextColor="#8A8179"
-                keyboardType="email-address"
-                autoCapitalize="none"
                 value={forgotEmail}
                 onChangeText={setForgotEmail}
-                className="flex-1 ml-2.5 text-base text-ink dark:text-ink-darkDefault font-medium"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                className="flex-1 ml-2.5 text-sm text-ink dark:text-ink-darkDefault font-medium"
               />
             </View>
 
             <TouchableOpacity
-              activeOpacity={0.88}
               onPress={handleSendResetLink}
-              className="w-full bg-brand-primary py-3.5 rounded-full items-center justify-center shadow-xs"
+              className="w-full h-12 rounded-full bg-brand-primary items-center justify-center shadow-xs"
             >
-              <Text className="text-white font-bold text-sm">
+              <Text className="text-sm font-bold text-white">
                 Send Reset Link
               </Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
