@@ -1,31 +1,35 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
   MapPin,
-  Moon,
-  ClockCounterClockwise,
-  SignOut,
+  PencilSimple,
   CaretRight,
   Receipt,
-  Compass,
+  User,
+  ArrowClockwise,
+  SignOut,
+  Bicycle,
 } from 'phosphor-react-native';
 import * as Haptics from 'expo-haptics';
 import { useSessionStore } from '@/stores/useSessionStore';
+import { useSavedStore } from '@/stores/useSavedStore';
 import { useCartStore } from '@/stores/useCartStore';
-import { Wordmark } from '@/components/common/Wordmark';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { profile, addresses, isDarkMode, toggleDarkMode } = useSessionStore();
+  const { profile, isDarkMode, toggleDarkMode, addresses } = useSessionStore();
+  const savedProductIds = useSavedStore((s) => s.savedProductIds);
   const clearCart = useCartStore((s) => s.clearCart);
+
+  const initial = profile.name?.charAt(0)?.toUpperCase() || 'F';
+  const currentAddress = addresses[0]?.line || '12 Admiralty Way, Lekki Phase 1, Lagos';
 
   const handleResetDemo = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     Alert.alert(
       'Reset Demo Data',
-      'This will reset your basket, addresses, and sample session back to fresh default state.',
+      'This will reset your basket, applied deals, and session back to defaults.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -55,189 +59,216 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView
-      edges={['top']}
-      className="flex-1 bg-paper-light dark:bg-paper-dark"
-    >
-      <View className="px-4 py-3 border-b border-line-light dark:border-line-dark">
-        <Text className="text-2xl font-bold tracking-tight text-ink dark:text-ink-darkDefault">
-          My Account
-        </Text>
+    <View className="flex-1 bg-paper-light dark:bg-paper-dark">
+      {/* Curved Tangerine Brand Header */}
+      <View
+        className="bg-brand-primary pt-12 pb-5 px-4 shadow-sm"
+        style={{
+          borderBottomLeftRadius: 32,
+          borderBottomRightRadius: 32,
+        }}
+      >
+        <Text className="text-2xl font-black text-white">Profile</Text>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 60 }}
       >
-        {/* User Card - Initial Letter Avatar */}
-        <View className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-line-light dark:border-line-dark flex-row items-center mb-5 shadow-xs">
-          <View
-            style={{ width: 56, height: 56, minWidth: 56, minHeight: 56 }}
-            className="rounded-full bg-brand-primary items-center justify-center shadow-xs"
+        {/* User Profile Card */}
+        <View className="bg-card-light dark:bg-card-dark rounded-3xl p-4 border border-line-light dark:border-line-dark flex-row items-center justify-between mb-4 shadow-2xs">
+          <View className="flex-row items-center flex-1 mr-2">
+            <View className="w-14 h-14 rounded-full bg-brand-primary items-center justify-center shadow-xs">
+              <Text className="text-white text-2xl font-black">{initial}</Text>
+            </View>
+            <View className="ml-3.5 flex-1">
+              <Text className="text-lg font-black text-ink dark:text-ink-darkDefault">
+                {profile.name || 'FrontendGeek'}
+              </Text>
+              <Text className="text-xs text-ink-muted mt-0.5">
+                {profile.email || 'frontendgeek@biteful.com'}
+              </Text>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            className="w-9 h-9 rounded-full bg-paper-light dark:bg-paper-dark border border-line-light dark:border-line-dark items-center justify-center"
           >
-            <Text className="text-white text-2xl font-black">
-              {profile.name?.charAt(0)?.toUpperCase() || 'F'}
-            </Text>
-          </View>
-          <View className="ml-3.5 flex-1">
-            <Text className="text-lg font-bold text-ink dark:text-ink-darkDefault">
-              {profile.name || 'FrontendGeek'}
-            </Text>
-            <Text className="text-sm text-ink-muted">{profile.email || 'frontendgeek@biteful.com'}</Text>
-            <Text className="text-xs text-ink-muted/80 mt-0.5">
-              {profile.phone}
-            </Text>
-          </View>
+            <PencilSimple size={16} color="#8A8179" />
+          </TouchableOpacity>
         </View>
 
-        {/* Orders Section */}
-        <Text className="text-sm font-bold uppercase tracking-wider text-ink-muted mb-2 px-1">
-          Orders & Activity
+        {/* Quick Stat Cards */}
+        <View className="flex-row gap-3 mb-6">
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => router.push('/orders')}
+            className="flex-1 bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-line-light dark:border-line-dark shadow-2xs"
+          >
+            <Text className="text-2xl font-black text-brand-primary">5</Text>
+            <Text className="text-xs font-bold text-ink-muted mt-0.5">Orders</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => router.push('/(tabs)/saved')}
+            className="flex-1 bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-line-light dark:border-line-dark shadow-2xs"
+          >
+            <Text className="text-2xl font-black text-brand-primary">
+              {savedProductIds.length || 4}
+            </Text>
+            <Text className="text-xs font-bold text-ink-muted mt-0.5">Saved</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Account Links */}
+        <Text className="text-xs font-black uppercase tracking-wider text-ink-muted mb-2 px-1">
+          Account
         </Text>
-        <View className="bg-card-light dark:bg-card-dark rounded-2xl border border-line-light dark:border-line-dark mb-5 overflow-hidden">
+        <View className="bg-card-light dark:bg-card-dark rounded-2xl border border-line-light dark:border-line-dark mb-6 overflow-hidden shadow-2xs">
+          {/* My Orders */}
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => router.push('/orders')}
-            className="p-3.5 flex-row items-center justify-between"
+            className="p-4 flex-row items-center justify-between border-b border-line-light dark:border-line-dark"
           >
-            <View className="flex-row items-center">
-              <Receipt size={18} weight="bold" color="#FF5A36" />
-              <View className="ml-2.5">
+            <View className="flex-row items-center flex-1 mr-2">
+              <View className="w-8 h-8 rounded-full bg-brand-wash dark:bg-brand-washDark items-center justify-center mr-3">
+                <Receipt size={16} weight="bold" color="#FF5A36" />
+              </View>
+              <View className="flex-1">
                 <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault">
-                  My Orders
+                  My orders
                 </Text>
-                <Text className="text-xs text-ink-muted mt-0.5">
-                  Track live orders & view history
+                <Text className="text-xs text-brand-primary font-semibold mt-0.5">
+                  1 on the way
                 </Text>
               </View>
             </View>
             <CaretRight size={16} color="#8A8179" />
           </TouchableOpacity>
-        </View>
 
-        {/* Addresses Section */}
-        <View className="flex-row items-center justify-between mb-2 px-1">
-          <Text className="text-sm font-bold uppercase tracking-wider text-ink-muted">
-            Saved Addresses
-          </Text>
-          <TouchableOpacity onPress={() => router.push('/addresses')}>
-            <Text className="text-xs font-bold text-brand-primary">Manage</Text>
-          </TouchableOpacity>
-        </View>
-        <View className="bg-card-light dark:bg-card-dark rounded-2xl border border-line-light dark:border-line-dark mb-5 overflow-hidden">
-          {addresses.map((addr, idx) => (
-            <TouchableOpacity
-              key={addr.id}
-              activeOpacity={0.7}
-              onPress={() => router.push('/addresses')}
-              className={`p-3.5 flex-row items-center justify-between ${
-                idx !== addresses.length - 1
-                  ? 'border-b border-line-light dark:border-line-dark'
-                  : ''
-              }`}
-            >
-              <View className="flex-row items-center flex-1 pr-2">
-                <MapPin size={18} weight="fill" color="#FF5A36" />
-                <View className="ml-2.5">
-                  <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault">
-                    {addr.label}
-                  </Text>
-                  <Text
-                    numberOfLines={1}
-                    className="text-xs text-ink-muted mt-0.5"
-                  >
-                    {addr.line}
-                  </Text>
-                </View>
-              </View>
-              <CaretRight size={16} color="#8A8179" />
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Settings & Preferences */}
-        <Text className="text-sm font-bold uppercase tracking-wider text-ink-muted mb-2 px-1">
-          Preferences & Account
-        </Text>
-        <View className="bg-card-light dark:bg-card-dark rounded-2xl border border-line-light dark:border-line-dark mb-6 overflow-hidden">
-          {/* Dark Mode Switch */}
-          <View className="p-3.5 flex-row items-center justify-between border-b border-line-light dark:border-line-dark">
-            <View className="flex-row items-center">
-              <Moon size={18} weight="bold" color="#FF5A36" />
-              <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault ml-2.5">
-                Dark Mode
-              </Text>
-            </View>
-            <Switch
-              value={isDarkMode}
-              onValueChange={toggleDarkMode}
-              trackColor={{ false: '#EFECE6', true: '#FF5A36' }}
-              thumbColor="#FFFFFF"
-            />
-          </View>
-
-          {/* App Tour & Onboarding */}
+          {/* Addresses */}
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => router.push('/onboarding')}
-            className="p-3.5 flex-row items-center justify-between border-b border-line-light dark:border-line-dark"
+            onPress={() => router.push('/addresses')}
+            className="p-4 flex-row items-center justify-between border-b border-line-light dark:border-line-dark"
           >
-            <View className="flex-row items-center">
-              <Compass size={18} weight="bold" color="#FF5A36" />
-              <View className="ml-2.5">
+            <View className="flex-row items-center flex-1 mr-2">
+              <View className="w-8 h-8 rounded-full bg-brand-wash dark:bg-brand-washDark items-center justify-center mr-3">
+                <MapPin size={16} weight="bold" color="#FF5A36" />
+              </View>
+              <View className="flex-1">
                 <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault">
-                  App Tour & Onboarding
+                  Addresses
                 </Text>
-                <Text className="text-xs text-ink-muted mt-0.5">
-                  Explore features & welcome guide
+                <Text numberOfLines={1} className="text-xs text-ink-muted mt-0.5">
+                  Delivering to Home, {currentAddress}
                 </Text>
               </View>
             </View>
             <CaretRight size={16} color="#8A8179" />
           </TouchableOpacity>
 
-          {/* Reset Demo Data */}
+          {/* Personal Details */}
+          <View className="p-4 flex-row items-center justify-between">
+            <View className="flex-row items-center flex-1 mr-2">
+              <View className="w-8 h-8 rounded-full bg-brand-wash dark:bg-brand-washDark items-center justify-center mr-3">
+                <User size={16} weight="bold" color="#FF5A36" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault">
+                  Personal details
+                </Text>
+                <Text className="text-xs text-ink-muted mt-0.5">
+                  {profile.name || 'FrontendGeek'} · {profile.phone || '+1 810 123 4567'}
+                </Text>
+              </View>
+            </View>
+            <CaretRight size={16} color="#8A8179" />
+          </View>
+        </View>
+
+        {/* Appearance Control */}
+        <Text className="text-xs font-black uppercase tracking-wider text-ink-muted mb-2 px-1">
+          Appearance
+        </Text>
+        <View className="bg-card-light dark:bg-card-dark rounded-2xl p-2 border border-line-light dark:border-line-dark mb-6 flex-row shadow-2xs">
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => isDarkMode && toggleDarkMode()}
+            className={`flex-1 py-2.5 rounded-xl items-center justify-center ${
+              !isDarkMode ? 'bg-brand-primary shadow-xs' : 'bg-transparent'
+            }`}
+          >
+            <Text
+              className={`text-xs font-bold ${
+                !isDarkMode ? 'text-white' : 'text-ink-muted'
+              }`}
+            >
+              Light
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => !isDarkMode && toggleDarkMode()}
+            className={`flex-1 py-2.5 rounded-xl items-center justify-center ${
+              isDarkMode ? 'bg-brand-primary shadow-xs' : 'bg-transparent'
+            }`}
+          >
+            <Text
+              className={`text-xs font-bold ${
+                isDarkMode ? 'text-white' : 'text-ink-muted'
+              }`}
+            >
+              Dark
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Demo Settings */}
+        <Text className="text-xs font-black uppercase tracking-wider text-ink-muted mb-2 px-1">
+          Demo Settings
+        </Text>
+        <View className="bg-card-light dark:bg-card-dark rounded-2xl border border-line-light dark:border-line-dark mb-6 overflow-hidden shadow-2xs">
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={handleResetDemo}
-            className="p-3.5 flex-row items-center justify-between border-b border-line-light dark:border-line-dark"
+            className="p-4 flex-row items-center justify-between border-b border-line-light dark:border-line-dark"
           >
-            <View className="flex-row items-center">
-              <ClockCounterClockwise size={18} weight="bold" color="#FF5A36" />
-              <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault ml-2.5">
-                Reset Demo Data
-              </Text>
+            <View className="flex-row items-center flex-1 mr-2">
+              <View className="w-8 h-8 rounded-full bg-brand-wash dark:bg-brand-washDark items-center justify-center mr-3">
+                <ArrowClockwise size={16} weight="bold" color="#FF5A36" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault">
+                  Reset demo data
+                </Text>
+                <Text className="text-xs text-ink-muted mt-0.5">
+                  Clears cart, saved items, orders and edits
+                </Text>
+              </View>
             </View>
             <CaretRight size={16} color="#8A8179" />
           </TouchableOpacity>
 
-          {/* Sign Out */}
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={handleSignOut}
-            className="p-3.5 flex-row items-center justify-between"
+            className="p-4 flex-row items-center justify-between"
           >
-            <View className="flex-row items-center">
-              <SignOut size={18} weight="bold" color="#DC2626" />
-              <Text className="text-sm font-bold text-red-600 ml-2.5">
-                Sign Out
-              </Text>
+            <View className="flex-row items-center flex-1 mr-2">
+              <View className="w-8 h-8 rounded-full bg-red-500/10 items-center justify-center mr-3">
+                <SignOut size={16} weight="bold" color="#EF4444" />
+              </View>
+              <Text className="text-sm font-bold text-red-500">Sign out</Text>
             </View>
             <CaretRight size={16} color="#8A8179" />
           </TouchableOpacity>
         </View>
-
-        {/* Branding Footer */}
-        <View className="items-center py-6">
-          <Wordmark size="md" />
-          <Text className="text-xs text-ink-muted mt-1">
-            Good food, craved and delivered fast.
-          </Text>
-          <Text className="text-xs text-ink-muted/60 mt-0.5">
-            Version 1.0.0 (NativeWind & Expo)
-          </Text>
-        </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

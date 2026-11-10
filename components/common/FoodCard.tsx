@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Heart, Plus, Star, ClockAfternoon } from 'phosphor-react-native';
+import { Heart, Plus, Flame, ClockAfternoon } from 'phosphor-react-native';
 import * as Haptics from 'expo-haptics';
 import { Product } from '@/types/catalog';
 import { FoodArtView } from './FoodArtView';
@@ -32,68 +32,67 @@ export function FoodCard({ product, onPress }: FoodCardProps) {
     <TouchableOpacity
       activeOpacity={0.88}
       onPress={onPress}
-      className="bg-card-light dark:bg-card-dark rounded-2xl p-3.5 mb-3.5 border border-line-light dark:border-line-dark shadow-sm flex-1"
+      className="bg-card-light dark:bg-card-dark rounded-3xl p-3.5 mb-3 border border-line-light dark:border-line-dark shadow-2xs flex-1 justify-between"
     >
-      {/* Top row: Star rating + Heart */}
-      <View className="flex-row items-center justify-between mb-2">
-        <View className="flex-row items-center bg-brand-wash dark:bg-brand-washDark px-2 py-0.5 rounded-full">
-          <Star size={13} weight="fill" color="#FFAA00" />
-          <Text className="text-xs font-semibold text-brand-deep ml-1">
-            {product.rating.toFixed(1)}
+      {/* Top row: Name & Favorite Heart */}
+      <View>
+        <View className="flex-row items-start justify-between">
+          <Text
+            numberOfLines={1}
+            className="text-sm font-bold text-ink dark:text-ink-darkDefault flex-1 mr-1"
+          >
+            {product.name}
           </Text>
+          <TouchableOpacity
+            hitSlop={8}
+            onPress={handleToggleSaved}
+            className="p-0.5"
+          >
+            <Heart
+              size={18}
+              weight={saved ? 'fill' : 'regular'}
+              color={saved ? '#FF5A36' : '#8A8179'}
+            />
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          hitSlop={8}
-          onPress={handleToggleSaved}
-          className="p-1"
-        >
-          <Heart
-            size={20}
-            weight={saved ? 'fill' : 'regular'}
-            color={saved ? '#FF5A36' : '#8A8179'}
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Food art render */}
-      <View className="items-center justify-center my-2">
-        <FoodArtView art={product.art} size={88} />
-      </View>
-
-      {/* Name and time */}
-      <Text
-        numberOfLines={1}
-        className="text-base font-bold text-ink dark:text-ink-darkDefault mt-1"
-      >
-        {product.name}
-      </Text>
-
-      <View className="flex-row items-center mt-1 space-x-2">
-        <View className="flex-row items-center">
-          <ClockAfternoon size={13} color="#8A8179" />
-          <Text className="text-xs text-ink-muted ml-1">
-            {product.minutes} min
-          </Text>
-        </View>
-        <Text className="text-xs text-ink-muted ml-2">
-          • {product.calories} kcal
-        </Text>
-      </View>
-
-      {/* Bottom row: Price and Add Button */}
-      <View className="flex-row items-center justify-between mt-3 pt-2 border-t border-line-light dark:border-line-dark">
-        <Text className="text-base font-extrabold text-ink dark:text-ink-darkDefault">
+        <Text className="text-xs font-black text-brand-primary mt-0.5">
           {formatMoney(product.priceCents)}
         </Text>
+      </View>
 
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={handleAdd}
-          className="bg-brand-primary w-8 h-8 rounded-full items-center justify-center shadow-sm"
-        >
-          <Plus size={18} weight="bold" color="#FFFFFF" />
-        </TouchableOpacity>
+      {/* Food art center */}
+      <View className="items-center justify-center my-2.5">
+        <FoodArtView art={product.art} size={74} />
+      </View>
+
+      {/* Bottom metadata & Add Button */}
+      <View className="space-y-1">
+        <View className="flex-row items-center">
+          <Flame size={12} weight="fill" color="#FF5A36" />
+          <Text className="text-[11px] text-ink-muted ml-1 font-medium">
+            {product.calories} Calories
+          </Text>
+        </View>
+
+        <View className="flex-row items-center justify-between pt-1">
+          <View className="flex-row items-center">
+            <ClockAfternoon size={12} color="#8A8179" />
+            <Text className="text-[11px] text-ink-muted ml-1 font-medium">
+              {product.minutes} min
+            </Text>
+          </View>
+
+          {/* Add button */}
+          <TouchableOpacity
+            activeOpacity={0.75}
+            hitSlop={6}
+            onPress={handleAdd}
+            className="w-8 h-8 rounded-full bg-brand-primary items-center justify-center shadow-2xs"
+          >
+            <Plus size={16} weight="bold" color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableOpacity>
   );

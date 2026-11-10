@@ -1,52 +1,60 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Heart } from 'phosphor-react-native';
-import { FoodCard } from '@/components/common/FoodCard';
-import { useCatalogStore } from '@/stores/useCatalogStore';
+import { HeartBreak, Heart } from 'phosphor-react-native';
 import { useSavedStore } from '@/stores/useSavedStore';
+import { useCatalogStore } from '@/stores/useCatalogStore';
+import { FoodCard } from '@/components/common/FoodCard';
 
 export default function SavedScreen() {
   const router = useRouter();
-  const savedIds = useSavedStore((s) => s.savedProductIds);
+  const savedProductIds = useSavedStore((s) => s.savedProductIds);
   const products = useCatalogStore((s) => s.products);
 
-  const savedDishes = products.filter((p) => savedIds.includes(p.id));
+  const savedProducts = products.filter((p) => savedProductIds.includes(p.id));
 
   return (
-    <SafeAreaView
-      edges={['top']}
-      className="flex-1 bg-paper-light dark:bg-paper-dark"
-    >
-      <View className="px-4 py-3 border-b border-line-light dark:border-line-dark">
-        <Text className="text-2xl font-bold tracking-tight text-ink dark:text-ink-darkDefault">
-          Saved Dishes
-        </Text>
-        <Text className="text-sm text-ink-muted">
-          Your favorite meals ready to re-order
+    <View className="flex-1 bg-paper-light dark:bg-paper-dark">
+      {/* Curved Tangerine Brand Header */}
+      <View
+        className="bg-brand-primary pt-12 pb-5 px-4 shadow-sm"
+        style={{
+          borderBottomLeftRadius: 32,
+          borderBottomRightRadius: 32,
+        }}
+      >
+        <Text className="text-2xl font-black text-white">Saved</Text>
+        <Text className="text-xs font-semibold text-white/85 mt-0.5">
+          {savedProducts.length} {savedProducts.length === 1 ? 'dish' : 'dishes'}
         </Text>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16 }}
-      >
-        {savedDishes.length === 0 ? (
-          <View className="items-center justify-center py-24">
-            <View className="w-16 h-16 rounded-full bg-brand-wash dark:bg-brand-washDark items-center justify-center mb-3">
-              <Heart size={32} weight="duotone" color="#FF5A36" />
-            </View>
-            <Text className="text-lg font-bold text-ink dark:text-ink-darkDefault">
-              No saved dishes yet
-            </Text>
-            <Text className="text-sm text-ink-muted text-center mt-1 px-8">
-              Tap the heart icon on any dish to save it here for later.
-            </Text>
+      {savedProducts.length === 0 ? (
+        <View className="flex-1 items-center justify-center p-8">
+          <View className="w-20 h-20 rounded-full bg-brand-wash dark:bg-brand-washDark items-center justify-center mb-4">
+            <Heart size={40} weight="duotone" color="#FF5A36" />
           </View>
-        ) : (
+          <Text className="text-xl font-black text-ink dark:text-ink-darkDefault mb-1 text-center">
+            No saved dishes yet
+          </Text>
+          <Text className="text-sm text-ink-muted text-center mb-6">
+            Tap the heart icon on any dish to bookmark your favorites here.
+          </Text>
+          <TouchableOpacity
+            activeOpacity={0.88}
+            onPress={() => router.push('/(tabs)/')}
+            className="px-6 py-3 rounded-full bg-brand-primary shadow-xs"
+          >
+            <Text className="text-sm font-bold text-white">Explore Menu</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
+        >
           <View className="flex-row flex-wrap justify-between">
-            {savedDishes.map((product, idx) => (
+            {savedProducts.map((product, idx) => (
               <View
                 key={product.id}
                 style={{ width: '48%' }}
@@ -59,8 +67,8 @@ export default function SavedScreen() {
               </View>
             ))}
           </View>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      )}
+    </View>
   );
 }

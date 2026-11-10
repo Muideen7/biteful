@@ -6,19 +6,19 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
   ShoppingBagOpen,
   Tag,
-  X,
-  ArrowRight,
+  Trash,
+  Plus,
+  Minus,
   Sparkle,
+  CaretRight,
 } from 'phosphor-react-native';
 import * as Haptics from 'expo-haptics';
 import { useCartStore } from '@/stores/useCartStore';
 import { FoodArtView } from '@/components/common/FoodArtView';
-import { QtyStepper } from '@/components/common/QtyStepper';
 import { formatMoney } from '@/utils/money';
 
 export default function CartScreen() {
@@ -27,7 +27,6 @@ export default function CartScreen() {
     lines,
     updateQuantity,
     appliedDeal,
-    applyDeal,
     clearCart,
     subtotalCents,
     discountCents,
@@ -35,211 +34,211 @@ export default function CartScreen() {
     totalCents,
   } = useCartStore();
 
-  const [orderPlaced, setOrderPlaced] = useState(false);
-
   const subtotal = subtotalCents();
   const discount = discountCents();
   const fee = deliveryFeeCents();
   const total = totalCents();
+  const itemCount = lines.reduce((acc, l) => acc + l.quantity, 0);
 
   const handleCheckout = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    setOrderPlaced(true);
     clearCart();
     Alert.alert(
       'Order Placed! 🎉',
-      'Your hot meal is being prepared and will be on its way shortly.',
+      'Your hot meal is being prepared and will be delivered shortly.',
       [
         {
-          text: 'Awesome',
-          onPress: () => setOrderPlaced(false),
+          text: 'Track Order',
+          onPress: () => router.push('/orders'),
         },
       ]
     );
   };
 
-  if (lines.length === 0) {
-    return (
-      <SafeAreaView
-        edges={['top']}
-        className="flex-1 bg-paper-light dark:bg-paper-dark"
-      >
-        <View className="px-4 py-3 border-b border-line-light dark:border-line-dark">
-          <Text className="text-2xl font-bold tracking-tight text-ink dark:text-ink-darkDefault">
-            Your Basket
-          </Text>
-        </View>
+  const handleDecrease = (productId: string, currentQty: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    updateQuantity(productId, currentQty - 1);
+  };
 
-        <View className="flex-1 items-center justify-center p-6">
-          <View className="w-20 h-20 rounded-full bg-brand-wash dark:bg-brand-washDark items-center justify-center mb-4">
-            <ShoppingBagOpen size={38} weight="duotone" color="#FF5A36" />
-          </View>
-          <Text className="text-xl font-bold text-ink dark:text-ink-darkDefault">
-            Your basket is empty
-          </Text>
-          <Text className="text-sm text-ink-muted text-center mt-2 px-8 mb-6">
-            Explore our delicious best sellers and deals to fill your basket.
-          </Text>
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => router.push('/(tabs)/')}
-            className="bg-brand-primary px-6 py-3.5 rounded-full flex-row items-center shadow-sm"
-          >
-            <Text className="text-white font-bold text-base mr-2">
-              Browse Menu
-            </Text>
-            <ArrowRight size={18} weight="bold" color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const handleIncrease = (productId: string, currentQty: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    updateQuantity(productId, currentQty + 1);
+  };
 
   return (
-    <SafeAreaView
-      edges={['top']}
-      className="flex-1 bg-paper-light dark:bg-paper-dark"
-    >
-      <View className="px-4 py-3 border-b border-line-light dark:border-line-dark">
-        <Text className="text-2xl font-bold tracking-tight text-ink dark:text-ink-darkDefault">
-          Your Basket
+    <View className="flex-1 bg-paper-light dark:bg-paper-dark">
+      {/* Curved Tangerine Brand Header */}
+      <View
+        className="bg-brand-primary pt-12 pb-5 px-4 shadow-sm"
+        style={{
+          borderBottomLeftRadius: 32,
+          borderBottomRightRadius: 32,
+        }}
+      >
+        <Text className="text-2xl font-black text-white">Cart</Text>
+        <Text className="text-xs font-bold text-white/85 mt-0.5">
+          {itemCount} {itemCount === 1 ? 'item' : 'items'}
         </Text>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
-      >
-        {/* Cart Items List */}
-        <View className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-line-light dark:border-line-dark mb-4">
-          {lines.map((line, idx) => (
-            <View
-              key={line.product.id}
-              className={`flex-row items-center justify-between py-3 ${
-                idx !== lines.length - 1
-                  ? 'border-b border-line-light dark:border-line-dark'
-                  : ''
-              }`}
-            >
-              <FoodArtView art={line.product.art} size={48} />
-
-              <View className="flex-1 ml-3 pr-2">
-                <Text
-                  numberOfLines={1}
-                  className="text-base font-bold text-ink dark:text-ink-darkDefault"
-                >
-                  {line.product.name}
-                </Text>
-                <Text className="text-sm font-extrabold text-brand-primary mt-0.5">
-                  {formatMoney(line.product.priceCents * line.quantity)}
-                </Text>
-              </View>
-
-              <QtyStepper
-                size="sm"
-                quantity={line.quantity}
-                onIncrement={() =>
-                  updateQuantity(line.product.id, line.quantity + 1)
-                }
-                onDecrement={() =>
-                  updateQuantity(line.product.id, line.quantity - 1)
-                }
-              />
-            </View>
-          ))}
-        </View>
-
-        {/* Applied Voucher / Deal Strip */}
-        {appliedDeal ? (
-          <View className="bg-brand-wash dark:bg-brand-washDark rounded-2xl p-3.5 mb-4 border border-brand-primary/20 flex-row items-center justify-between">
-            <View className="flex-row items-center flex-1 pr-2">
-              <Sparkle size={18} weight="fill" color="#FF5A36" />
-              <View className="ml-2.5">
-                <Text className="text-sm font-bold text-brand-deep">
-                  Code: {appliedDeal.code} applied!
-                </Text>
-                <Text className="text-xs text-brand-deep/80">
-                  {appliedDeal.headline}
-                </Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              onPress={() => applyDeal(null)}
-              className="p-1"
-            >
-              <X size={16} weight="bold" color="#D93E1B" />
-            </TouchableOpacity>
+      {lines.length === 0 ? (
+        <View className="flex-1 items-center justify-center p-8">
+          <View className="w-20 h-20 rounded-full bg-brand-wash dark:bg-brand-washDark items-center justify-center mb-4">
+            <ShoppingBagOpen size={40} weight="duotone" color="#FF5A36" />
           </View>
-        ) : (
+          <Text className="text-xl font-black text-ink dark:text-ink-darkDefault mb-1 text-center">
+            Your cart is hungry
+          </Text>
+          <Text className="text-sm text-ink-muted text-center mb-6">
+            Explore delicious meals and savory dishes to add them here.
+          </Text>
           <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => router.push('/(tabs)/offers')}
-            className="bg-card-light dark:bg-card-dark rounded-2xl p-3.5 mb-4 border border-dashed border-brand-primary flex-row items-center justify-between"
+            activeOpacity={0.88}
+            onPress={() => router.push('/(tabs)/')}
+            className="px-6 py-3 rounded-full bg-brand-primary shadow-xs"
           >
-            <View className="flex-row items-center">
-              <Tag size={18} weight="bold" color="#FF5A36" />
-              <Text className="text-sm font-bold text-brand-primary ml-2">
-                Apply a Promo Code
-              </Text>
-            </View>
-            <ArrowRight size={16} weight="bold" color="#FF5A36" />
+            <Text className="text-sm font-bold text-white">Browse Menu</Text>
           </TouchableOpacity>
-        )}
+        </View>
+      ) : (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        >
+          {/* Cart Item Cards */}
+          <View className="space-y-3 mb-4">
+            {lines.map((line) => (
+              <View
+                key={line.product.id}
+                className="bg-card-light dark:bg-card-dark rounded-2xl p-3.5 border border-line-light dark:border-line-dark shadow-2xs flex-row items-center justify-between"
+              >
+                {/* Product Art & Info */}
+                <View className="flex-row items-center flex-1 mr-3">
+                  <View className="w-14 h-14 rounded-xl bg-brand-wash dark:bg-brand-washDark items-center justify-center mr-3">
+                    <FoodArtView art={line.product.art} size={42} />
+                  </View>
+                  <View className="flex-1">
+                    <Text
+                      numberOfLines={1}
+                      className="text-sm font-bold text-ink dark:text-ink-darkDefault"
+                    >
+                      {line.product.name}
+                    </Text>
+                    <Text className="text-xs font-black text-brand-primary mt-0.5">
+                      {formatMoney(line.product.priceCents * line.quantity)}
+                    </Text>
+                  </View>
+                </View>
 
-        {/* Receipt Totals Card */}
-        <View className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-line-light dark:border-line-dark">
-          <Text className="text-base font-bold text-ink dark:text-ink-darkDefault mb-3">
-            Summary
-          </Text>
+                {/* Stepper with Trash for Qty 1 */}
+                <View className="flex-row items-center bg-[#F2EDE8] dark:bg-[#231F1C] rounded-full px-2.5 py-1 border border-line-light dark:border-line-dark">
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleDecrease(line.product.id, line.quantity)
+                    }
+                    className="w-7 h-7 rounded-full items-center justify-center"
+                  >
+                    {line.quantity === 1 ? (
+                      <Trash size={14} color="#FF5A36" />
+                    ) : (
+                      <Minus size={14} weight="bold" color="#181512" />
+                    )}
+                  </TouchableOpacity>
 
-          <View className="flex-row justify-between mb-2">
-            <Text className="text-sm text-ink-muted">Subtotal</Text>
-            <Text className="text-sm font-semibold text-ink dark:text-ink-darkDefault">
-              {formatMoney(subtotal)}
-            </Text>
+                  <Text className="text-sm font-black text-ink dark:text-ink-darkDefault mx-2.5 min-w-[14px] text-center">
+                    {line.quantity}
+                  </Text>
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleIncrease(line.product.id, line.quantity)
+                    }
+                    className="w-7 h-7 rounded-full bg-brand-primary items-center justify-center"
+                  >
+                    <Plus size={14} weight="bold" color="#FFFFFF" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
           </View>
 
-          {discount > 0 && (
-            <View className="flex-row justify-between mb-2">
-              <Text className="text-sm text-brand-primary font-medium">
-                Discount
-              </Text>
-              <Text className="text-sm font-bold text-brand-primary">
-                -{formatMoney(discount)}
+          {/* Coupon / Deal Card */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => router.push('/(tabs)/offers')}
+            className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-line-light dark:border-line-dark shadow-2xs flex-row items-center justify-between mb-4"
+          >
+            <View className="flex-row items-center flex-1 mr-2">
+              <View className="w-8 h-8 rounded-full bg-brand-wash dark:bg-brand-washDark items-center justify-center mr-3">
+                <Tag size={16} weight="fill" color="#FF5A36" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault">
+                  {appliedDeal
+                    ? `${appliedDeal.code} applied`
+                    : 'Apply Discount Voucher'}
+                </Text>
+                <Text className="text-xs text-ink-muted mt-0.5">
+                  {appliedDeal
+                    ? appliedDeal.terms
+                    : 'Select a voucher to save on your order'}
+                </Text>
+              </View>
+            </View>
+            <CaretRight size={16} color="#8A8179" />
+          </TouchableOpacity>
+
+          {/* Bill Summary Breakdown */}
+          <View className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-line-light dark:border-line-dark shadow-2xs mb-6 space-y-2">
+            <View className="flex-row justify-between">
+              <Text className="text-sm text-ink-muted">Subtotal</Text>
+              <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault">
+                {formatMoney(subtotal)}
               </Text>
             </View>
-          )}
 
-          <View className="flex-row justify-between mb-3">
-            <Text className="text-sm text-ink-muted">Delivery fee</Text>
-            <Text className="text-sm font-semibold text-ink dark:text-ink-darkDefault">
-              {fee === 0 ? 'FREE' : formatMoney(fee)}
-            </Text>
+            <View className="flex-row justify-between">
+              <Text className="text-sm text-ink-muted">Delivery fee</Text>
+              <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault">
+                {fee === 0 ? 'FREE' : formatMoney(fee)}
+              </Text>
+            </View>
+
+            {discount > 0 && (
+              <View className="flex-row justify-between">
+                <Text className="text-sm font-bold text-brand-primary">
+                  Discount ({appliedDeal?.code})
+                </Text>
+                <Text className="text-sm font-bold text-brand-primary">
+                  -{formatMoney(discount)}
+                </Text>
+              </View>
+            )}
+
+            <View className="h-px bg-line-light dark:bg-line-dark my-1" />
+
+            <View className="flex-row justify-between pt-1">
+              <Text className="text-base font-black text-ink dark:text-ink-darkDefault">
+                Total
+              </Text>
+              <Text className="text-base font-black text-ink dark:text-ink-darkDefault">
+                {formatMoney(total)}
+              </Text>
+            </View>
           </View>
 
-          <View className="pt-3 border-t border-line-light dark:border-line-dark flex-row justify-between items-center">
-            <Text className="text-base font-bold text-ink dark:text-ink-darkDefault">
-              Total Amount
+          {/* Floating Checkout Pill Button */}
+          <TouchableOpacity
+            activeOpacity={0.88}
+            onPress={handleCheckout}
+            className="w-full h-14 rounded-full bg-brand-primary items-center justify-center shadow-md"
+          >
+            <Text className="text-base font-extrabold text-white tracking-wide">
+              Checkout · {formatMoney(total)}
             </Text>
-            <Text className="text-xl font-extrabold text-brand-primary">
-              {formatMoney(total)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Place Order CTA */}
-        <TouchableOpacity
-          activeOpacity={0.88}
-          onPress={handleCheckout}
-          className="mt-6 bg-brand-primary py-4 rounded-full flex-row items-center justify-center shadow-md"
-        >
-          <Text className="text-white font-extrabold text-lg mr-2">
-            Place Order • {formatMoney(total)}
-          </Text>
-          <ArrowRight size={20} weight="bold" color="#FFFFFF" />
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+          </TouchableOpacity>
+        </ScrollView>
+      )}
+    </View>
   );
 }

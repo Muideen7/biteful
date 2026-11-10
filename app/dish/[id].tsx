@@ -2,7 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { X, Heart, Star, ClockAfternoon, Fire, Plus, Minus, ArrowRight } from 'phosphor-react-native';
+import {
+  X,
+  Heart,
+  Star,
+  ClockAfternoon,
+  Flame,
+  Plus,
+  Minus,
+} from 'phosphor-react-native';
 import * as Haptics from 'expo-haptics';
 import { useCatalogStore } from '@/stores/useCatalogStore';
 import { useCartStore } from '@/stores/useCartStore';
@@ -15,6 +23,9 @@ export default function DishModalScreen() {
   const router = useRouter();
 
   const product = useCatalogStore((s) => s.getProductById(id || ''));
+  const restaurant = useCatalogStore((s) =>
+    product ? s.getRestaurantById(product.restaurantId) : undefined
+  );
   const addItem = useCartStore((s) => s.addItem);
   const { isSaved, toggleSaved } = useSavedStore();
 
@@ -22,11 +33,14 @@ export default function DishModalScreen() {
 
   if (!product) {
     return (
-      <SafeAreaView className="flex-1 bg-paper-light dark:bg-paper-dark p-4">
-        <TouchableOpacity onPress={() => router.back()} className="p-2">
-          <X size={24} color="#181512" />
+      <SafeAreaView className="flex-1 bg-paper-light dark:bg-paper-dark p-4 items-center justify-center">
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="absolute top-12 left-4 w-10 h-10 rounded-full bg-card-light dark:bg-card-dark items-center justify-center"
+        >
+          <X size={20} color="#181512" />
         </TouchableOpacity>
-        <Text className="text-center mt-12 text-ink-muted">Dish not found</Text>
+        <Text className="text-ink-muted font-bold text-base">Dish not found</Text>
       </SafeAreaView>
     );
   }
@@ -47,69 +61,78 @@ export default function DishModalScreen() {
     toggleSaved(product.id);
   };
 
+  const handleIncrease = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setQuantity((q) => q + 1);
+  };
+
+  const handleDecrease = () => {
+    if (quantity > 1) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setQuantity((q) => q - 1);
+    }
+  };
+
   return (
     <SafeAreaView
       edges={['top', 'bottom']}
-      className="flex-1 bg-card-light dark:bg-card-dark"
+      className="flex-1 bg-paper-light dark:bg-paper-dark justify-between"
     >
-      {/* Header bar: Close button & Heart toggle */}
-      <View className="flex-row items-center justify-between px-4 py-3">
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => router.back()}
-          className="w-10 h-10 rounded-full bg-paper-light dark:bg-paper-dark border border-line-light dark:border-line-dark items-center justify-center"
-        >
-          <X size={20} weight="bold" color="#181512" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={handleToggleSaved}
-          className="w-10 h-10 rounded-full bg-paper-light dark:bg-paper-dark border border-line-light dark:border-line-dark items-center justify-center"
-        >
-          <Heart
-            size={22}
-            weight={saved ? 'fill' : 'regular'}
-            color={saved ? '#FF5A36' : '#8A8179'}
-          />
-        </TouchableOpacity>
-      </View>
-
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 }}
+        contentContainerStyle={{
+          padding: 20,
+          paddingBottom: 24,
+          maxWidth: 480,
+          width: '100%',
+          alignSelf: 'center',
+        }}
       >
-        {/* Large 3D Food Art Presentation */}
-        <View className="items-center justify-center py-6">
-          <FoodArtView art={product.art} size={160} />
+        {/* Top Hero Card with Food Art, Close button & Favorite button */}
+        <View className="w-full bg-brand-wash dark:bg-brand-washDark rounded-[32px] p-6 relative items-center justify-center min-h-[260px] border border-brand-primary/15 shadow-2xs mb-6">
+          {/* Close button */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => router.back()}
+            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white dark:bg-[#231F1C] border border-line-light dark:border-line-dark items-center justify-center shadow-xs z-10"
+          >
+            <X size={18} weight="bold" color="#181512" />
+          </TouchableOpacity>
+
+          {/* Favorite Heart button */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleToggleSaved}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white dark:bg-[#231F1C] border border-line-light dark:border-line-dark items-center justify-center shadow-xs z-10"
+          >
+            <Heart
+              size={18}
+              weight={saved ? 'fill' : 'regular'}
+              color={saved ? '#FF5A36' : '#8A8179'}
+            />
+          </TouchableOpacity>
+
+          {/* Hero Food Art */}
+          <FoodArtView art={product.art} size={130} />
         </View>
 
-        {/* Name and Price */}
-        <View className="flex-row items-start justify-between mt-2">
-          <View className="flex-1 pr-3">
-            <Text className="text-2xl font-extrabold text-ink dark:text-ink-darkDefault">
+        {/* Title & Price Row */}
+        <View className="flex-row items-start justify-between mb-2">
+          <View className="flex-1 mr-3">
+            <Text className="text-2xl font-black text-ink dark:text-ink-darkDefault">
               {product.name}
             </Text>
-            <View className="flex-row items-center mt-1.5 space-x-3">
-              <View className="flex-row items-center bg-brand-wash dark:bg-brand-washDark px-2 py-0.5 rounded-full mr-2">
-                <Star size={13} weight="fill" color="#FFAA00" />
-                <Text className="text-xs font-bold text-brand-deep ml-1">
-                  {product.rating.toFixed(1)}
+            {restaurant && (
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => router.push(`/restaurant/${restaurant.id}`)}
+                className="mt-1"
+              >
+                <Text className="text-sm font-bold text-brand-primary">
+                  from {restaurant.name}
                 </Text>
-              </View>
-              <View className="flex-row items-center mr-3">
-                <ClockAfternoon size={14} color="#8A8179" />
-                <Text className="text-xs text-ink-muted ml-1">
-                  {product.minutes} min
-                </Text>
-              </View>
-              <View className="flex-row items-center">
-                <Fire size={14} color="#8A8179" />
-                <Text className="text-xs text-ink-muted ml-1">
-                  {product.calories} kcal
-                </Text>
-              </View>
-            </View>
+              </TouchableOpacity>
+            )}
           </View>
 
           <Text className="text-2xl font-black text-brand-primary">
@@ -117,56 +140,75 @@ export default function DishModalScreen() {
           </Text>
         </View>
 
-        {/* Description */}
-        <Text className="text-sm text-ink-soft dark:text-ink-darkSoft leading-relaxed mt-4">
-          {product.description}
-        </Text>
-
-        {/* Quantity Selection */}
-        <View className="flex-row items-center justify-between mt-8 p-4 bg-paper-light dark:bg-paper-dark rounded-2xl border border-line-light dark:border-line-dark">
-          <Text className="text-base font-bold text-ink dark:text-ink-darkDefault">
-            Select Quantity
-          </Text>
-
-          <View className="flex-row items-center bg-card-light dark:bg-card-dark rounded-full px-2 py-1 border border-line-light dark:border-line-dark">
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setQuantity(Math.max(1, quantity - 1));
-              }}
-              className="w-8 h-8 rounded-full bg-brand-wash dark:bg-brand-washDark items-center justify-center"
-            >
-              <Minus size={14} weight="bold" color="#FF5A36" />
-            </TouchableOpacity>
-
-            <Text className="font-extrabold text-base text-ink dark:text-ink-darkDefault mx-4 text-center w-6">
-              {quantity}
+        {/* Meta Facts Row: Rating, Calories, Time */}
+        <View className="flex-row items-center gap-4 my-4 py-3 border-y border-line-light dark:border-line-dark">
+          <View className="flex-row items-center">
+            <Star size={16} weight="fill" color="#FFAA00" />
+            <Text className="text-xs font-bold text-ink dark:text-ink-darkDefault ml-1.5">
+              {product.rating.toFixed(1)}
             </Text>
+          </View>
 
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setQuantity(quantity + 1);
-              }}
-              className="w-8 h-8 rounded-full bg-brand-primary items-center justify-center"
-            >
-              <Plus size={14} weight="bold" color="#FFFFFF" />
-            </TouchableOpacity>
+          <View className="flex-row items-center">
+            <Flame size={16} weight="fill" color="#FF5A36" />
+            <Text className="text-xs font-bold text-ink-muted ml-1.5">
+              {product.calories} Calories
+            </Text>
+          </View>
+
+          <View className="flex-row items-center">
+            <ClockAfternoon size={16} color="#8A8179" />
+            <Text className="text-xs font-bold text-ink-muted ml-1.5">
+              {product.minutes} min
+            </Text>
           </View>
         </View>
 
-        {/* Add to Basket CTA */}
+        {/* Description */}
+        <Text className="text-sm leading-relaxed text-ink-muted dark:text-ink-darkMuted font-medium mb-6">
+          {product.description}
+        </Text>
+      </ScrollView>
+
+      {/* Floating Bottom Bar: Stepper & Add Button */}
+      <View className="p-4 bg-card-light dark:bg-card-dark border-t border-line-light dark:border-line-dark flex-row items-center gap-4 shadow-sm">
+        {/* Stepper */}
+        <View className="flex-row items-center bg-[#F2EDE8] dark:bg-[#231F1C] rounded-full px-3 py-1.5 border border-line-light dark:border-line-dark">
+          <TouchableOpacity
+            onPress={handleDecrease}
+            disabled={quantity <= 1}
+            className="w-8 h-8 rounded-full items-center justify-center"
+          >
+            <Minus
+              size={16}
+              weight="bold"
+              color={quantity > 1 ? '#181512' : '#B5AFA8'}
+            />
+          </TouchableOpacity>
+
+          <Text className="text-base font-black text-ink dark:text-ink-darkDefault mx-3 min-w-[16px] text-center">
+            {quantity}
+          </Text>
+
+          <TouchableOpacity
+            onPress={handleIncrease}
+            className="w-8 h-8 rounded-full items-center justify-center"
+          >
+            <Plus size={16} weight="bold" color="#181512" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Add Pill Button */}
         <TouchableOpacity
           activeOpacity={0.88}
           onPress={handleAddToCart}
-          className="mt-6 bg-brand-primary py-4 rounded-full flex-row items-center justify-center shadow-md"
+          className="flex-1 h-13 rounded-full bg-brand-primary items-center justify-center shadow-xs"
         >
-          <Text className="text-white font-extrabold text-lg mr-2">
-            Add to Basket • {formatMoney(totalPrice)}
+          <Text className="text-base font-extrabold text-white tracking-wide">
+            Add · {formatMoney(totalPrice)}
           </Text>
-          <ArrowRight size={20} weight="bold" color="#FFFFFF" />
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
