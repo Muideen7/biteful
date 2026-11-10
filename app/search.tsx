@@ -22,7 +22,7 @@ import { FoodArtView } from '@/components/common/FoodArtView';
 
 export default function SearchScreen() {
   const router = useRouter();
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<any>(null);
   const [query, setQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([
     'Burger',

@@ -42,7 +42,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <House
               size={24}
-              color={color}
+              color={String(color)}
               weight={focused ? 'fill' : 'regular'}
             />
           ),
@@ -55,7 +55,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Heart
               size={24}
-              color={color}
+              color={String(color)}
               weight={focused ? 'fill' : 'regular'}
             />
           ),
@@ -69,7 +69,7 @@ export default function TabLayout() {
             <View className="relative">
               <ShoppingBagOpen
                 size={24}
-                color={color}
+                color={String(color)}
                 weight={focused ? 'fill' : 'regular'}
               />
               {itemCount > 0 && (
@@ -90,7 +90,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ticket
               size={24}
-              color={color}
+              color={String(color)}
               weight={focused ? 'fill' : 'regular'}
             />
           ),
@@ -103,7 +103,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <User
               size={24}
-              color={color}
+              color={String(color)}
               weight={focused ? 'fill' : 'regular'}
             />
           ),

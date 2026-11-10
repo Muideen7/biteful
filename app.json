@@ -37,7 +37,10 @@
             "./assets/fonts/Bricolage-ExtraBold.ttf"
           ]
         }
-      ]
+      ],
+      "expo-image",
+      "expo-splash-screen",
+      "expo-status-bar"
     ]
   }
 }
