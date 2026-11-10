@@ -24,24 +24,24 @@ import Svg, { Path } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { useSessionStore } from '@/stores/useSessionStore';
 
-function GoogleIcon({ size = 20 }: { size?: number }) {
+function GoogleIcon({ size = 18 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Path
         fill="#4285F4"
-        d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.87c2.26-2.09 3.675-5.17 3.675-9.15z"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
       />
       <Path
         fill="#34A853"
-        d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.87-3.05c-1.08.72-2.45 1.16-4.06 1.16-3.13 0-5.78-2.11-6.73-4.96H1.25v3.15C3.25 21.37 7.31 24 12 24z"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
       />
       <Path
         fill="#FBBC05"
-        d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.25C.45 8.22 0 10.05 0 12s.45 3.78 1.25 5.39l4.02-3.15z"
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
       />
       <Path
         fill="#EA4335"
-        d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.63 1.25 6.61l4.02 3.15c.95-2.85 3.6-4.96 6.73-4.96z"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
       />
     </Svg>
   );
@@ -50,6 +50,7 @@ function GoogleIcon({ size = 20 }: { size?: number }) {
 export default function SignUpScreen() {
   const router = useRouter();
   const setProfile = useSessionStore((s) => s.setProfile);
+  const isDarkMode = useSessionStore((s) => s.isDarkMode);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -271,23 +272,31 @@ export default function SignUpScreen() {
           {/* Side-by-Side Social Buttons */}
           <View className="flex-row items-center gap-3 mt-4 mb-8">
             <TouchableOpacity
-              activeOpacity={0.85}
+              activeOpacity={0.82}
               onPress={handleGoogleAuth}
-              className="flex-1 h-13 rounded-full bg-card-light dark:bg-card-dark border border-line-light dark:border-line-dark flex-row items-center justify-center shadow-xs"
+              className="flex-1 h-14 rounded-full bg-[#F2EDE8] dark:bg-[#231F1C] border border-line-light dark:border-line-dark flex-row items-center justify-center shadow-2xs"
             >
-              <GoogleIcon size={20} />
-              <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault ml-2">
+              <View className="w-8 h-8 rounded-full bg-white items-center justify-center mr-2.5 shadow-2xs border border-black/5">
+                <GoogleIcon size={18} />
+              </View>
+              <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault">
                 Google
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              activeOpacity={0.85}
+              activeOpacity={0.82}
               onPress={handleAppleAuth}
-              className="flex-1 h-13 rounded-full bg-card-light dark:bg-card-dark border border-line-light dark:border-line-dark flex-row items-center justify-center shadow-xs"
+              className="flex-1 h-14 rounded-full bg-[#F2EDE8] dark:bg-[#231F1C] border border-line-light dark:border-line-dark flex-row items-center justify-center shadow-2xs"
             >
-              <AppleLogo size={20} weight="fill" color="#181512" />
-              <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault ml-2">
+              <View className="w-8 h-8 rounded-full bg-white dark:bg-[#2E2824] items-center justify-center mr-2.5 shadow-2xs border border-black/5 dark:border-white/5">
+                <AppleLogo
+                  size={18}
+                  weight="fill"
+                  color={isDarkMode ? '#FFFFFF' : '#181512'}
+                />
+              </View>
+              <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault">
                 Apple
               </Text>
             </TouchableOpacity>
