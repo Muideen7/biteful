@@ -20,6 +20,8 @@ interface SessionState {
   setDarkMode: (enabled: boolean) => void;
   completeOnboarding: () => void;
   markNotificationRead: (id: string) => void;
+  markAllNotificationsRead: () => void;
+  addAddress: (address: Omit<Address, 'id'>) => void;
   currentAddress: () => Address;
 }
 
@@ -35,6 +37,15 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     set((state) => ({ profile: { ...state.profile, ...update } })),
 
   setSelectedAddress: (id) => set({ selectedAddressId: id }),
+
+  addAddress: (newAddr) =>
+    set((state) => {
+      const id = `a_${Date.now()}`;
+      return {
+        addresses: [...state.addresses, { ...newAddr, id }],
+        selectedAddressId: id,
+      };
+    }),
 
   toggleDarkMode: () => {
     const next = !get().isDarkMode;
@@ -76,6 +87,11 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       notifications: state.notifications.map((n) =>
         n.id === id ? { ...n, read: true } : n
       ),
+    })),
+
+  markAllNotificationsRead: () =>
+    set((state) => ({
+      notifications: state.notifications.map((n) => ({ ...n, read: true })),
     })),
 
   currentAddress: () => {

@@ -6,14 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
   ArrowLeft,
   MagnifyingGlass,
   X,
-  ClockCounterClockwise,
-  Trash,
+  Star,
+  ClockAfternoon,
+  CaretRight,
 } from 'phosphor-react-native';
 import * as Haptics from 'expo-haptics';
 import { useCatalogStore } from '@/stores/useCatalogStore';
@@ -29,12 +29,12 @@ export default function SearchScreen() {
     'Sushi',
     'Pizza',
     'Ramen',
+    'Chicken',
   ]);
 
-  const { products, restaurants, categories } = useCatalogStore();
+  const { products, restaurants } = useCatalogStore();
 
   useEffect(() => {
-    // Focus search input on mount
     const timer = setTimeout(() => inputRef.current?.focus(), 150);
     return () => clearTimeout(timer);
   }, []);
@@ -44,19 +44,13 @@ export default function SearchScreen() {
     setQuery(term);
   };
 
-  const handleRemoveRecent = (term: string) => {
+  const handleClearQuery = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setRecentSearches((prev) => prev.filter((t) => t !== term));
-  };
-
-  const handleClearAllRecent = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setRecentSearches([]);
+    setQuery('');
   };
 
   const trimmed = query.trim().toLowerCase();
 
-  // Results
   const matchedProducts = trimmed
     ? products.filter(
         (p) =>
@@ -74,169 +68,119 @@ export default function SearchScreen() {
     : [];
 
   return (
-    <SafeAreaView
-      edges={['top']}
-      className="flex-1 bg-paper-light dark:bg-paper-dark"
-    >
-      {/* Search Header Bar */}
-      <View className="px-4 py-3 flex-row items-center border-b border-line-light dark:border-line-dark">
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => router.back()}
-          className="w-10 h-10 rounded-full bg-card-light dark:bg-card-dark border border-line-light dark:border-line-dark items-center justify-center mr-3"
-        >
-          <ArrowLeft size={20} weight="bold" color="#181512" />
-        </TouchableOpacity>
+    <View className="flex-1 bg-paper-light dark:bg-paper-dark">
+      {/* Curved Tangerine Brand Header */}
+      <View
+        className="bg-brand-primary pt-12 pb-5 px-4 shadow-sm"
+        style={{
+          borderBottomLeftRadius: 32,
+          borderBottomRightRadius: 32,
+        }}
+      >
+        <View className="flex-row items-center">
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => router.back()}
+            className="w-10 h-10 rounded-full bg-white/20 border border-white/30 items-center justify-center mr-3"
+          >
+            <ArrowLeft size={20} weight="bold" color="#FFFFFF" />
+          </TouchableOpacity>
 
-        <View className="flex-1 flex-row items-center bg-card-light dark:bg-card-dark rounded-2xl px-3.5 py-2.5 border border-line-light dark:border-line-dark shadow-xs">
-          <MagnifyingGlass size={18} weight="bold" color="#8A8179" />
-          <TextInput
-            ref={inputRef}
-            placeholder="Search dishes or restaurants..."
-            placeholderTextColor="#8A8179"
-            value={query}
-            onChangeText={setQuery}
-            className="flex-1 ml-2 text-base text-ink dark:text-ink-darkDefault font-medium"
-          />
-          {query.length > 0 && (
-            <TouchableOpacity
-              onPress={() => setQuery('')}
-              hitSlop={8}
-              className="p-1"
-            >
-              <X size={16} weight="bold" color="#8A8179" />
-            </TouchableOpacity>
-          )}
+          {/* Search Input Pill */}
+          <View className="flex-1 h-12 bg-white dark:bg-[#231F1C] rounded-full px-4 flex-row items-center shadow-xs">
+            <MagnifyingGlass size={18} weight="bold" color="#8A8179" />
+            <TextInput
+              ref={inputRef}
+              placeholder="Search dishes or restaurants..."
+              placeholderTextColor="#8A8179"
+              value={query}
+              onChangeText={setQuery}
+              className="flex-1 ml-2.5 text-sm text-ink dark:text-ink-darkDefault font-medium"
+            />
+            {query.length > 0 && (
+              <TouchableOpacity onPress={handleClearQuery} className="p-1">
+                <X size={16} weight="bold" color="#8A8179" />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
       >
-        {trimmed.length === 0 ? (
-          <>
-            {/* Recent Searches */}
-            {recentSearches.length > 0 && (
-              <View className="mb-6">
-                <View className="flex-row items-center justify-between mb-3">
-                  <View className="flex-row items-center">
-                    <ClockCounterClockwise size={16} color="#8A8179" />
-                    <Text className="text-sm font-bold uppercase tracking-wider text-ink-muted ml-2">
-                      Recent Searches
-                    </Text>
-                  </View>
-                  <TouchableOpacity onPress={handleClearAllRecent}>
-                    <Text className="text-xs font-semibold text-brand-primary">
-                      Clear all
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View className="flex-row flex-wrap gap-2">
-                  {recentSearches.map((term) => (
-                    <TouchableOpacity
-                      key={term}
-                      activeOpacity={0.75}
-                      onPress={() => handleSelectRecent(term)}
-                      className="flex-row items-center bg-card-light dark:bg-card-dark px-3 py-1.5 rounded-full border border-line-light dark:border-line-dark"
-                    >
-                      <Text className="text-sm font-medium text-ink dark:text-ink-darkDefault mr-1.5">
-                        {term}
-                      </Text>
-                      <TouchableOpacity
-                        hitSlop={6}
-                        onPress={() => handleRemoveRecent(term)}
-                      >
-                        <X size={12} weight="bold" color="#8A8179" />
-                      </TouchableOpacity>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* Popular Categories */}
-            <Text className="text-sm font-bold uppercase tracking-wider text-ink-muted mb-3">
-              Popular Categories
+        {!trimmed ? (
+          /* Recent Searches */
+          <View>
+            <Text className="text-sm font-bold uppercase tracking-wider text-ink-muted mb-3 px-1">
+              Popular Searches
             </Text>
-            <View className="flex-row flex-wrap gap-2 mb-6">
-              {categories.slice(0, 6).map((cat) => (
+            <View className="flex-row flex-wrap gap-2">
+              {recentSearches.map((term) => (
                 <TouchableOpacity
-                  key={cat.id}
-                  activeOpacity={0.75}
-                  onPress={() => handleSelectRecent(cat.name)}
-                  className="flex-row items-center bg-card-light dark:bg-card-dark px-3.5 py-2 rounded-2xl border border-line-light dark:border-line-dark"
+                  key={term}
+                  activeOpacity={0.8}
+                  onPress={() => handleSelectRecent(term)}
+                  className="px-4 py-2 rounded-full bg-card-light dark:bg-card-dark border border-line-light dark:border-line-dark shadow-2xs"
                 >
-                  <FoodArtView art={cat.art} size={22} />
-                  <Text className="ml-2 text-sm font-bold text-ink dark:text-ink-darkDefault">
-                    {cat.name}
+                  <Text className="text-sm font-bold text-ink dark:text-ink-darkDefault">
+                    {term}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
-
-            {/* Top Restaurants */}
-            <Text className="text-sm font-bold uppercase tracking-wider text-ink-muted mb-3">
-              Popular Restaurants
-            </Text>
-            {restaurants.slice(0, 3).map((r) => (
-              <TouchableOpacity
-                key={r.id}
-                activeOpacity={0.8}
-                onPress={() => router.push(`/restaurant/${r.id}`)}
-                className="bg-card-light dark:bg-card-dark rounded-2xl p-3.5 mb-3 border border-line-light dark:border-line-dark flex-row items-center"
-              >
-                <FoodArtView art={r.art} size={48} />
-                <View className="ml-3 flex-1">
-                  <Text className="text-base font-bold text-ink dark:text-ink-darkDefault">
-                    {r.name}
-                  </Text>
-                  <Text className="text-xs text-ink-muted mt-0.5">
-                    {r.cuisine} • {r.minMinutes}-{r.maxMinutes} min • ★{' '}
-                    {r.rating.toFixed(1)}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </>
+          </View>
         ) : (
-          <>
-            {/* Search Results */}
+          /* Search Results */
+          <View>
+            {/* Matched Restaurants */}
             {matchedRestaurants.length > 0 && (
-              <View className="mb-5">
-                <Text className="text-base font-bold text-ink dark:text-ink-darkDefault mb-2">
-                  Restaurants ({matchedRestaurants.length})
+              <View className="mb-6">
+                <Text className="text-lg font-black text-ink dark:text-ink-darkDefault mb-3 px-1">
+                  Restaurants · {matchedRestaurants.length}
                 </Text>
-                {matchedRestaurants.map((r) => (
+                {matchedRestaurants.map((restaurant) => (
                   <TouchableOpacity
-                    key={r.id}
-                    activeOpacity={0.8}
-                    onPress={() => router.push(`/restaurant/${r.id}`)}
-                    className="bg-card-light dark:bg-card-dark rounded-2xl p-3 mb-2 border border-line-light dark:border-line-dark flex-row items-center"
+                    key={restaurant.id}
+                    activeOpacity={0.85}
+                    onPress={() => router.push(`/restaurant/${restaurant.id}`)}
+                    className="p-3.5 rounded-2xl bg-card-light dark:bg-card-dark border border-line-light dark:border-line-dark mb-2.5 flex-row items-center justify-between shadow-2xs"
                   >
-                    <FoodArtView art={r.art} size={42} />
-                    <View className="ml-3 flex-1">
-                      <Text className="text-base font-bold text-ink dark:text-ink-darkDefault">
-                        {r.name}
-                      </Text>
-                      <Text className="text-xs text-ink-muted">
-                        {r.cuisine} • {r.minMinutes}-{r.maxMinutes} min
-                      </Text>
+                    <View className="flex-row items-center flex-1 mr-2">
+                      <FoodArtView art={restaurant.art} size={48} />
+                      <View className="ml-3 flex-1">
+                        <Text className="text-base font-bold text-ink dark:text-ink-darkDefault">
+                          {restaurant.name}
+                        </Text>
+                        <Text className="text-xs text-ink-muted mt-0.5">
+                          {restaurant.cuisine}
+                        </Text>
+                        <View className="flex-row items-center mt-1">
+                          <Star size={12} weight="fill" color="#FFAA00" />
+                          <Text className="text-xs font-bold text-ink dark:text-ink-darkDefault ml-1">
+                            {restaurant.rating.toFixed(1)}
+                          </Text>
+                          <Text className="text-xs text-ink-muted ml-2">
+                            • {restaurant.minMinutes}-{restaurant.maxMinutes} min
+                          </Text>
+                        </View>
+                      </View>
                     </View>
+                    <CaretRight size={18} color="#8A8179" />
                   </TouchableOpacity>
                 ))}
               </View>
             )}
 
-            <Text className="text-base font-bold text-ink dark:text-ink-darkDefault mb-3">
-              Dishes ({matchedProducts.length})
+            {/* Matched Dishes */}
+            <Text className="text-lg font-black text-ink dark:text-ink-darkDefault mb-3 px-1">
+              Dishes · {matchedProducts.length}
             </Text>
-
             {matchedProducts.length === 0 && matchedRestaurants.length === 0 ? (
               <View className="items-center py-12">
-                <Text className="text-base font-medium text-ink-muted">
-                  No results found for "{query}"
+                <Text className="text-ink-muted text-base font-semibold">
+                  No matching results found for "{query}".
                 </Text>
               </View>
             ) : (
@@ -255,9 +199,9 @@ export default function SearchScreen() {
                 ))}
               </View>
             )}
-          </>
+          </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
